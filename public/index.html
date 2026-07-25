@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#000000" />
+  <title>Chris Hair Cut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="img/logo.png">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-logo">
+      <img src="img/logo.png" alt="Chris Hair Cut logo"/>
+    </div>
+    <div class="topnav-right">
+      <button class="btn-booknow" onclick="openModal()">Book Now</button>
+      <button class="topnav-search" aria-label="Search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="6.5" cy="6.5" r="4.5"/>
+        <line x1="10.5" y1="10.5" x2="14" y2="14"/>
+      </svg>
+    </button>
+    <button class="topnav-account" id="accountBtn" onclick="openAuthModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/>
+      </svg>
+      <span id="accountBtnLabel">Sign In</span>
+    </button>
+  </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <h1>Chris Hair Cut</h1>
+    <div class="hero-pills">
+      <a href="#services" class="hero-pill active">Services</a>
+      <a href="#" class="hero-pill" onclick="openModal(); return false;">Appointments</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-wrap" id="services">
+  <div class="content-grid">
+
+    <!-- LEFT: SERVICE MENU -->
+    <div>
+      <div class="service-header">
+        <h2 class="section-heading">Service Menu</h2>
+        <div class="service-actions">
+          <button class="btn-book-lg" onclick="openModal()">Book</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" id="tab-services" onclick="switchTab('services')">Services</div>
+        <div class="tab" id="tab-staff" onclick="switchTab('staff')">Staff</div>
+      </div>
+
+      <!-- Services Panel -->
+      <div class="services-panel" id="panel-services">
+        <div class="services-grid">
+
+          <div class="service-card" role="button" tabindex="0" onclick="openModal('Mens Haircut')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('Mens Haircut')">
+            <div class="service-title">Mens Haircut</div>
+            <div class="service-footer">
+              <span class="service-book" onclick="openModal('Mens Haircut')">Book now</span>
+              <span class="service-meta">$17.00 &nbsp;•&nbsp; 30 mins</span>
+            </div>
+          </div>
+
+          <div class="service-card" role="button" tabindex="0" onclick="openModal('Buzzcut')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('Buzzcut')">
+            <div class="service-title">Buzzcut</div>
+            <div class="service-footer">
+              <span class="service-book" onclick="openModal('Buzzcut')">Book now</span>
+              <span class="service-meta">$10.00 &nbsp;•&nbsp; 30 mins</span>
+            </div>
+          </div>
+
+          <div class="service-card" role="button" tabindex="0" onclick="openModal('UIC Student')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('UIC Student')">
+            <div class="service-title">UIC Student</div>
+            <div class="service-note">Show student ID at appointment</div>
+            <div class="service-footer">
+              <span class="service-book" onclick="openModal('UIC Student')">Book now</span>
+              <span class="service-meta">$13.00 &nbsp;•&nbsp; 30 mins</span>
+            </div>
+          </div>
+
+        </div>
+        <div class="services-note">House calls upon request</div>
+      </div>
+
+      <!-- Staff Panel -->
+      <div class="staff-panel" id="panel-staff">
+        <div class="staff-card">
+          <div class="staff-avatar">C</div>
+          <div>
+            <div class="staff-name">Chris</div>
+            <div class="staff-role">Hair Stylist</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location & Hours -->
+      <div class="location-section">
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.014405102811!2d-87.64873953348784!3d41.8674608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2da62450474f%3A0xeb8c44b4bce9016d!2sUIC%20Roosevelt%20Road%20Building!5e1!3m2!1sen!2sus!4v1779919914922!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        <div class="location-info">
+          <h3>Location &amp; Hours</h3>
+          <a href="https://maps.google.com/?q=UIC%20Roosevelt%20Road%20Building" target="_blank" class="get-directions">Get Directions</a>
+          <table class="hours-table" id="hoursTable">
+            <tr id="row-mon"><td>Monday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-tue"><td>Tuesday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-wed"><td>Wednesday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-thu"><td>Thursday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-fri"><td>Friday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-sat"><td>Saturday</td><td>11:00 AM – 7:00 PM</td></tr>
+            <tr id="row-sun"><td>Sunday</td><td>11:00 AM – 7:00 PM</td></tr>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+  </div>
+</main>
+
+<!-- REVIEWS -->
+<section id="reviews-section" style="padding: 3rem 1.5rem;">
+  <div class="main-wrap" style="padding: 0;">
+    <h2 class="section-heading" style="margin-bottom:1.25rem;">Reviews</h2>
+    <div class="reviews-grid" id="reviewsGrid">
+      <p class="reviews-empty">Loading reviews…</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-divider"></div>
+  <div class="footer-contact">
+    <a href="mailto:chrishaircut07@gmail.com">chrishaircut07@gmail.com</a>
+    <a href="tel:7733140148">773.314.0148</a>
+  </div>
+  <div class="footer-social">
+    <a href="mailto:chrishaircut07@gmail.com" class="social-icon" aria-label="Email">
+      <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
+    </a>
+    <a href="https://instagram.com/chris_hair_cut/" target="_blank" class="social-icon" aria-label="Instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.1-4.8.1-3.3 1.7-4.8 4.9-4.9 1.3-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 12 5.8zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
+    </a>
+  </div>
+</footer>
+
+<!-- ACCOUNT / AUTH MODAL -->
+<div class="auth-modal-overlay" id="authModalOverlay" onclick="if(event.target===this) closeAuthModal()">
+  <div class="auth-modal">
+    <button class="auth-modal-close" onclick="closeAuthModal()" aria-label="Close">×</button>
+
+    <!-- LOGGED OUT: login/signup -->
+    <div id="authLoggedOut">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="authTabSignup" onclick="switchAuthTab('signup')">Create Account</div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="auth-panel active" id="authPanelLogin">
+        <p class="auth-error" id="loginErrorMsg"></p>
+        <form onsubmit="customerLogin(event)">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="auth-submit">Sign In</button>
+        </form>
+      </div>
+
+      <!-- SIGNUP -->
+      <div class="auth-panel" id="authPanelSignup">
+        <p class="auth-error" id="signupErrorMsg"></p>
+        <form onsubmit="customerSignup(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="signup-fname">First Name</label>
+              <input type="text" id="signup-fname" placeholder="First name" required />
+            </div>
+            <div class="form-group">
+              <label for="signup-lname">Last Name</label>
+              <input type="text" id="signup-lname" placeholder="Last name" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="signup-phone">Phone</label>
+            <input type="tel" id="signup-phone" placeholder="773-555-0100" />
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" placeholder="••••••••" required minlength="6" />
+          </div>
+          <button type="submit" class="auth-submit">Create Account</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- LOGGED IN: account panel -->
+    <div id="authLoggedIn" class="account-panel-body">
+
+      <!-- MAIN ACCOUNT VIEW -->
+      <div id="acctMainView">
+        <div class="acct-header-row">
+          <p class="modal-title" style="margin-bottom:0;">My Account</p>
+          <button class="settings-gear-btn" onclick="openSettingsView()" aria-label="Account settings" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="account-info">
+          <p><strong id="acctName"></strong></p>
+          <p id="acctEmail"></p>
+        </div>
+        <p class="modal-title" id="acctBookingsHeading" style="font-size:14px;margin-bottom:0.75rem;">My Bookings</p>
+        <div class="account-bookings-list" id="acctBookingsList"></div>
+
+        <button class="account-logout-btn" onclick="customerLogout()">Log Out</button>
+      </div>
+
+      <!-- REVIEW SUBMISSION VIEW -->
+      <div id="acctReviewView" style="display:none;">
+        <div class="acct-header-row">
+          <button class="settings-back-btn" onclick="closeReviewView()" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <p class="modal-title" style="margin-bottom:0;">Leave a Review</p>
+        </div>
+
+        <p style="font-size:13px;color:#6b6560;margin-bottom:1rem;" id="reviewServiceLabel"></p>
+        <p class="auth-error" id="reviewErrorMsg"></p>
+
+        <div class="star-rating" id="starRating">
+          <span class="star" data-value="1">★</span>
+          <span class="star" data-value="2">★</span>
+          <span class="star" data-value="3">★</span>
+          <span class="star" data-value="4">★</span>
+          <span class="star" data-value="5">★</span>
+        </div>
+
+        <div class="form-group" style="margin-top:1rem;">
+          <label for="review-comment">Comment (optional)</label>
+          <textarea id="review-comment" placeholder="How was your experience?" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Photo (optional)</label>
+          <input type="file" id="review-photo-input" accept="image/png, image/jpeg, image/webp, image/gif" style="display:none;" onchange="handlePhotoSelect(event)" />
+
+          <div id="photoUploadPrompt" class="photo-upload-btn" onclick="document.getElementById('review-photo-input').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span>Add a Photo</span>
+          </div>
+
+          <div id="photoPreviewWrap" style="display:none;">
+            <img id="photoPreviewImg" class="photo-preview-img" alt="Selected photo preview" />
+            <button type="button" class="photo-remove-btn" onclick="removeSelectedPhoto()" aria-label="Remove photo">×</button>
+          </div>
+        </div>
+
+        <button class="auth-submit" onclick="submitReview()">Submit Review</button>
+      </div>
+
+      <!-- SETTINGS VIEW -->
+      <div id="acctSettingsView" style="display:none;">
+        <div class="acct-header-row">
+          <button class="settings-back-btn" onclick="closeSettingsView()" aria-label="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <p class="modal-title" style="margin-bottom:0;">Account Settings</p>
+        </div>
+
+        <p class="auth-error" id="settingsErrorMsg"></p>
+        <p class="settings-success" id="settingsSuccessMsg"></p>
+
+        <form onsubmit="updateAccountInfo(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="settings-fname">First Name</label>
+              <input type="text" id="settings-fname" required />
+            </div>
+            <div class="form-group">
+              <label for="settings-lname">Last Name</label>
+              <input type="text" id="settings-lname" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="settings-email">Email</label>
+            <input type="email" id="settings-email" required />
+          </div>
+          <div class="form-group">
+            <label for="settings-phone">Phone</label>
+            <input type="tel" id="settings-phone" />
+          </div>
+          <button type="submit" class="auth-submit">Save Changes</button>
+        </form>
+
+        <div class="settings-divider"></div>
+
+        <p class="settings-subheading">Change Password</p>
+        <form onsubmit="changePassword(event)">
+          <div class="form-group">
+            <label for="settings-current-password">Current Password</label>
+            <input type="password" id="settings-current-password" placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label for="settings-new-password">New Password</label>
+            <input type="password" id="settings-new-password" placeholder="••••••••" minlength="6" />
+          </div>
+          <button type="submit" class="auth-submit" style="background:#3a3530;">Update Password</button>
+        </form>
+
+        <div class="settings-divider"></div>
+
+        <button class="delete-account-btn" onclick="openDeleteConfirm()">Delete My Account</button>
+
+        <div id="deleteConfirmBox" style="display:none;margin-top:0.75rem;">
+          <p class="auth-error" id="deleteErrorMsg"></p>
+          <div class="form-group">
+            <label for="delete-password">Confirm Password</label>
+            <input type="password" id="delete-password" placeholder="••••••••" />
+          </div>
+          <button class="delete-account-btn" onclick="confirmDeleteAccount()">Yes, Permanently Delete My Account</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+
+    <div class="modal-form" id="modalForm">
+      <p class="modal-title" id="modal-title">Book an Appointment</p>
+
+      <form onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="m-fname">First Name</label>
+            <input type="text" id="m-fname" placeholder="First name" required />
+          </div>
+          <div class="form-group">
+            <label for="m-lname">Last Name</label>
+            <input type="text" id="m-lname" placeholder="Last name" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="m-phone">Phone</label>
+            <input type="tel" id="m-phone" placeholder="773-555-0100" required />
+          </div>
+          <div class="form-group">
+            <label for="m-email">Email</label>
+            <input type="email" id="m-email" placeholder="you@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="m-service">Service</label>
+          <select id="m-service" required>
+            <option value="" disabled selected>Choose a service…</option>
+            <option>Mens Haircut — $17.00 · 30 min</option>
+            <option>Buzzcut — $10.00 · 30 min</option>
+            <option>UIC Student — $13.00 · 30 min</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="m-date">Date</label>
+            <input type="date" id="m-date" required />
+          </div>
+          <div class="form-group">
+            <label for="m-time">Time (Central)</label>
+            <select id="m-time" required>
+                <option value="" disabled selected>Select…</option>
+                <option>11:00 AM</option><option>11:30 AM</option>
+                <option>12:00 PM</option><option>12:30 PM</option>
+                <option>1:00 PM</option><option>1:30 PM</option>
+                <option>2:00 PM</option><option>2:30 PM</option>
+                <option>3:00 PM</option><option>3:30 PM</option>
+                <option>4:00 PM</option><option>4:30 PM</option>
+                <option>5:00 PM</option><option>5:30 PM</option>
+                <option>6:00 PM</option><option>6:30 PM</option>
+              </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="m-notes">Notes (optional)</label>
+          <textarea id="m-notes" placeholder="Any requests or questions…"></textarea>
+        </div>
+        <button type="submit" id="submitBtn" class="modal-submit">Confirm Booking Request</button>
+      </form>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-check">✓</div>
+      <p class="success-title">Booking Requested!</p>
+      <p class="success-msg">Thanks! Chris will confirm your appointment via phone or email shortly.</p>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
