@@ -54,7 +54,7 @@ router.post('/', optionalAuth, async (req, res) => {
           <li><strong>Price:</strong> ${price}</li>
         </ul>
         <p>You'll receive another email once Chris confirms your appointment.</p>
-        <p>Questions? Text or call 773.314.0148.</p>
+        <p>Questions? Text or call 773.814.5649.</p>
       `
     });
 
@@ -151,7 +151,7 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
               <li><strong>Date:</strong> ${dateStr}</li>
               <li><strong>Price:</strong> ${booking.price}</li>
             </ul>
-            <p>See you then! Questions? Text or call 773.314.0148.</p>
+            <p>See you then! Questions? Text or call 773.814.5649.</p>
           `
         });
       }
@@ -177,7 +177,7 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
               <li><strong>Service:</strong> ${booking.service}</li>
               <li><strong>Date:</strong> ${dateStr}</li>
             </ul>
-            <p>If this was a mistake or you'd like to rebook, text or call 773.314.0148.</p>
+            <p>If this was a mistake or you'd like to rebook, text or call 773.814.5649.</p>
           `
         });
       }
