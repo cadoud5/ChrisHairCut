@@ -4,6 +4,16 @@ const pool = require('../db');
 const { sendEmail } = require('../emails/mailer');
 const { verifyToken, requireAdmin, optionalAuth } = require('../middleware/auth');
 const { createEvent, deleteEvent, getEvents } = require('../calendar');
+const { body, validationResult } = require('express-validator');
+
+function handleValidation(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ error: errors.array()[0].msg });
+    return true;
+  }
+  return false;
+}
 
 function readableDate(dateStr) {
   return new Date(dateStr).toLocaleString('en-US', {
@@ -12,9 +22,23 @@ function readableDate(dateStr) {
   });
 }
 
-router.post('/', optionalAuth, async (req, res) => {
-  const { name, phone, email, service, price, startDate, endDate, notes } = req.body;
-  const userId = req.user ? req.user.id : null;
+router.post('/',
+  optionalAuth,
+  [
+    body('name').trim().isLength({ min: 1, max: 150 }).withMessage('Name is required'),
+    body('phone').trim().isLength({ min: 7, max: 20 }).withMessage('Please enter a valid phone number'),
+    body('email').trim().isEmail().withMessage('Please enter a valid email').normalizeEmail(),
+    body('service').trim().isLength({ min: 1, max: 200 }).withMessage('Service is required'),
+    body('price').trim().isLength({ min: 1, max: 30 }).withMessage('Price is required'),
+    body('startDate').isISO8601().withMessage('Invalid start date'),
+    body('endDate').isISO8601().withMessage('Invalid end date'),
+    body('notes').optional({ checkFalsy: true }).trim().isLength({ max: 1000 }).withMessage('Notes are too long'),
+  ],
+  async (req, res) => {
+    if (handleValidation(req, res)) return;
+
+    const { name, phone, email, service, price, startDate, endDate, notes } = req.body;
+    const userId = req.user ? req.user.id : null;
 
   try {
     let calendarEventId = null;
@@ -54,7 +78,7 @@ router.post('/', optionalAuth, async (req, res) => {
           <li><strong>Price:</strong> ${price}</li>
         </ul>
         <p>You'll receive another email once Chris confirms your appointment.</p>
-        <p>Questions? Text or call 773.814.5649.</p>
+        <p>Questions? Text or call 773.314.0148.</p>
       `
     });
 
@@ -80,7 +104,8 @@ router.post('/', optionalAuth, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to create booking' });
   }
-});
+  }
+);
 
 router.get('/', verifyToken, requireAdmin, async (req, res) => {
   try {
@@ -107,14 +132,18 @@ router.get('/mine', verifyToken, async (req, res) => {
   }
 });
 
-router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
-  const { id } = req.params;
-  const { status, paid_amount } = req.body;
+router.patch('/:id',
+  verifyToken,
+  requireAdmin,
+  [
+    body('status').optional().isIn(['pending', 'confirmed', 'completed', 'cancelled']).withMessage('Invalid status'),
+    body('paid_amount').optional({ checkFalsy: true }).trim().isLength({ max: 30 }).withMessage('Paid amount is too long'),
+  ],
+  async (req, res) => {
+    if (handleValidation(req, res)) return;
 
-  const allowedStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
-  if (status && !allowedStatuses.includes(status)) {
-    return res.status(400).json({ error: 'Invalid status' });
-  }
+    const { id } = req.params;
+    const { status, paid_amount } = req.body;
 
   try {
     const existing = await pool.query('SELECT * FROM bookings WHERE id = $1', [id]);
@@ -151,7 +180,7 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
               <li><strong>Date:</strong> ${dateStr}</li>
               <li><strong>Price:</strong> ${booking.price}</li>
             </ul>
-            <p>See you then! Questions? Text or call 773.814.5649.</p>
+            <p>See you then! Questions? Text or call 773.314.0148.</p>
           `
         });
       }
@@ -177,7 +206,7 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
               <li><strong>Service:</strong> ${booking.service}</li>
               <li><strong>Date:</strong> ${dateStr}</li>
             </ul>
-            <p>If this was a mistake or you'd like to rebook, text or call 773.814.5649.</p>
+            <p>If this was a mistake or you'd like to rebook, text or call 773.314.0148.</p>
           `
         });
       }
@@ -188,7 +217,8 @@ router.patch('/:id', verifyToken, requireAdmin, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Failed to update booking' });
   }
-});
+  }
+);
 
 router.delete('/:id', verifyToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
