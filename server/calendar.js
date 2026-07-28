@@ -38,17 +38,33 @@ async function deleteEvent(eventId) {
   });
 }
 
-// Get all events between two dates (used for availability blocking)
-async function getEvents(timeMin, timeMax) {
-  const res = await calendar.events.list({
-    calendarId: 'primary',
-    timeMin,
-    timeMax,
-    singleEvents: true,
-    orderBy: 'startTime',
-  });
+// Calendars to check for busy times (booking events + personal calendar)
+const CALENDARS_TO_CHECK = [
+  'primary',
+  '2emq9q106jl92eqpr9c9rl8261s5eva8@import.calendar.google.com',
+];
 
-  return res.data.items || [];
+// Get all events between two dates across all relevant calendars
+// (used for availability blocking)
+async function getEvents(timeMin, timeMax) {
+  const results = await Promise.all(
+    CALENDARS_TO_CHECK.map(calendarId =>
+      calendar.events.list({
+        calendarId,
+        timeMin,
+        timeMax,
+        singleEvents: true,
+        orderBy: 'startTime',
+      }).then(res => res.data.items || [])
+       .catch(err => {
+         console.error(`Failed to fetch events for calendar ${calendarId}:`, err.message);
+         return [];
+       })
+    )
+  );
+
+  // Flatten all calendars' events into a single array
+  return results.flat();
 }
 
 module.exports = { createEvent, deleteEvent, getEvents };
