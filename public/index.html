@@ -139,9 +139,9 @@
 </main>
 
 <!-- REVIEWS -->
-<section id="reviews-section" style="padding: 3rem 1.5rem; display: none">
+<section id="reviews-section" style="padding: 3rem 1.5rem;">
   <div class="main-wrap" style="padding: 0;">
-    <h2 class="section-heading" style="margin-bottom:1.25rem;">Reviews</h2>
+    <h2 class="section-heading" style="margin-bottom:1.25rem;">What Clients Say</h2>
     <div class="reviews-grid" id="reviewsGrid">
       <p class="reviews-empty">Loading reviews…</p>
     </div>
@@ -152,11 +152,11 @@
 <footer>
   <div class="footer-divider"></div>
   <div class="footer-contact">
-    <a href="mailto:chrishaircut07@gmail.com">chrishaircut07@gmail.com</a>
-    <a href="tel:7738145649">773.814.5649</a>
+    <a href="mailto:cadoud05@gmail.com">cadoud05@gmail.com</a>
+    <a href="tel:7733140148">773.314.0148</a>
   </div>
   <div class="footer-social">
-    <a href="mailto:chrishaircut07@gmail.com" class="social-icon" aria-label="Email">
+    <a href="mailto:cadoud05@gmail.com" class="social-icon" aria-label="Email">
       <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
     </a>
     <a href="https://instagram.com/chris_hair_cut/" target="_blank" class="social-icon" aria-label="Instagram">
@@ -304,7 +304,7 @@
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
-          <p class="modal-title" style="margin-bottom:0;">Account Settings</p>
+          <p class="modal-title" style="margin-bottom:0;">Settings</p>
         </div>
 
         <p class="auth-error" id="settingsErrorMsg"></p>
@@ -349,6 +349,8 @@
 
         <div class="settings-divider"></div>
 
+        <p class="settings-subheading" style="color:#a32d2d;">Danger Zone</p>
+        <p style="font-size:12px;color:#9a9187;margin-bottom:0.75rem;">Deleting your account is permanent and cannot be undone.</p>
         <button class="delete-account-btn" onclick="openDeleteConfirm()">Delete My Account</button>
 
         <div id="deleteConfirmBox" style="display:none;margin-top:0.75rem;">
@@ -436,10 +438,512 @@
       <div class="success-check">✓</div>
       <p class="success-title">Booking Requested!</p>
       <p class="success-msg">Thanks! Chris will confirm your appointment via phone or email shortly.</p>
+
+      <div id="postBookingAccountPrompt" style="display:none; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid #ede7e2;">
+        <p style="font-size:13px; color:#3a3530; margin-bottom:0.75rem;">
+          Want to track this appointment and leave a review later? Create a free account — it takes 10 seconds.
+        </p>
+        <button class="auth-submit" style="width:100%;" onclick="openAccountPromptSignup()">Create Account</button>
+        <button class="account-logout-btn" style="width:100%; margin-top:0.5rem;" onclick="closeModal()">No thanks</button>
+      </div>
     </div>
   </div>
 </div>
 
+
+<script>
+  // ─────────────────────────────────────────
+  // CUSTOMER AUTH
+  // ─────────────────────────────────────────
+  function getCustomerToken() { return localStorage.getItem('customer_token'); }
+  function saveCustomerToken(token) { localStorage.setItem('customer_token', token); }
+  function getCustomerUser() {
+    const raw = localStorage.getItem('customer_user');
+    return raw ? JSON.parse(raw) : null;
+  }
+  function saveCustomerUser(user) { localStorage.setItem('customer_user', JSON.stringify(user)); }
+  function clearCustomerSession() {
+    localStorage.removeItem('customer_token');
+    localStorage.removeItem('customer_user');
+  }
+
+  function updateAccountButton() {
+    const label = document.getElementById('accountBtnLabel');
+    const user = getCustomerUser();
+    if (user && getCustomerToken()) {
+      label.textContent = user.name.split(' ')[0];
+    } else {
+      label.textContent = 'Sign In';
+    }
+  }
+
+  function openAuthModal() {
+    document.getElementById('authModalOverlay').classList.add('open');
+    const user = getCustomerUser();
+    if (user && getCustomerToken()) {
+      document.getElementById('acctSettingsView').style.display = 'none';
+      document.getElementById('acctMainView').style.display = 'block';
+      showAccountPanel();
+    } else {
+      document.getElementById('authLoggedOut').style.display = 'block';
+      document.getElementById('authLoggedIn').classList.remove('active');
+    }
+  }
+
+  function closeAuthModal() {
+    document.getElementById('authModalOverlay').classList.remove('open');
+  }
+
+  function switchAuthTab(tab) {
+    document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('authTabSignup').classList.toggle('active', tab === 'signup');
+    document.getElementById('authPanelLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('authPanelSignup').classList.toggle('active', tab === 'signup');
+  }
+
+  async function customerLogin(e) {
+    e.preventDefault();
+    const errorEl = document.getElementById('loginErrorMsg');
+    errorEl.style.display = 'none';
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Login failed';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      saveCustomerToken(data.token);
+      saveCustomerUser(data.user);
+
+      // If this account is an admin, also save the admin token
+      // so /admin.html auto-authenticates without a second login
+      if (data.user.role === 'admin') {
+        localStorage.setItem('admin_token', data.token);
+      }
+
+      updateAccountButton();
+      showAccountPanel();
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  async function customerSignup(e) {
+    e.preventDefault();
+    const errorEl = document.getElementById('signupErrorMsg');
+    errorEl.style.display = 'none';
+
+    const fname = document.getElementById('signup-fname').value.trim();
+    const lname = document.getElementById('signup-lname').value.trim();
+    const name = fname + ' ' + lname;
+    const email = document.getElementById('signup-email').value.trim();
+    const phone = document.getElementById('signup-phone').value.trim();
+    const password = document.getElementById('signup-password').value;
+
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Signup failed';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      saveCustomerToken(data.token);
+      saveCustomerUser(data.user);
+      updateAccountButton();
+      showAccountPanel();
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  function customerLogout() {
+    clearCustomerSession();
+    localStorage.removeItem('admin_token');
+    updateAccountButton();
+    closeAuthModal();
+  }
+
+  // ─────────────────────────────────────────
+  // ACCOUNT SETTINGS
+  // ─────────────────────────────────────────
+  function openSettingsView() {
+    const user = getCustomerUser();
+    if (!user) return;
+
+    const [first, ...rest] = user.name.split(' ');
+    document.getElementById('settings-fname').value = first || '';
+    document.getElementById('settings-lname').value = rest.join(' ') || '';
+    document.getElementById('settings-email').value = user.email || '';
+    document.getElementById('settings-phone').value = user.phone || '';
+
+    document.getElementById('settings-current-password').value = '';
+    document.getElementById('settings-new-password').value = '';
+    document.getElementById('settingsErrorMsg').style.display = 'none';
+    document.getElementById('settingsSuccessMsg').style.display = 'none';
+    document.getElementById('deleteConfirmBox').style.display = 'none';
+    document.getElementById('deleteErrorMsg').style.display = 'none';
+
+    document.getElementById('acctMainView').style.display = 'none';
+    document.getElementById('acctSettingsView').style.display = 'block';
+  }
+
+  function closeSettingsView() {
+    document.getElementById('acctSettingsView').style.display = 'none';
+    document.getElementById('acctMainView').style.display = 'block';
+  }
+
+  async function updateAccountInfo(e) {
+    e.preventDefault();
+    const errorEl = document.getElementById('settingsErrorMsg');
+    const successEl = document.getElementById('settingsSuccessMsg');
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    const fname = document.getElementById('settings-fname').value.trim();
+    const lname = document.getElementById('settings-lname').value.trim();
+    const name = fname + ' ' + lname;
+    const email = document.getElementById('settings-email').value.trim();
+    const phone = document.getElementById('settings-phone').value.trim();
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getCustomerToken()
+        },
+        body: JSON.stringify({ name, email, phone })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Failed to update account';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      saveCustomerUser(data);
+      updateAccountButton();
+      document.getElementById('acctName').textContent = data.name;
+      document.getElementById('acctEmail').textContent = data.email;
+
+      successEl.textContent = 'Account updated successfully.';
+      successEl.style.display = 'block';
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  async function changePassword(e) {
+    e.preventDefault();
+    const errorEl = document.getElementById('settingsErrorMsg');
+    const successEl = document.getElementById('settingsSuccessMsg');
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    const currentPassword = document.getElementById('settings-current-password').value;
+    const newPassword = document.getElementById('settings-new-password').value;
+
+    if (!currentPassword || !newPassword) {
+      errorEl.textContent = 'Both password fields are required to change your password.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getCustomerToken()
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Failed to update password';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      document.getElementById('settings-current-password').value = '';
+      document.getElementById('settings-new-password').value = '';
+
+      successEl.textContent = 'Password updated successfully.';
+      successEl.style.display = 'block';
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  function openDeleteConfirm() {
+    document.getElementById('deleteConfirmBox').style.display = 'block';
+  }
+
+  async function confirmDeleteAccount() {
+    const errorEl = document.getElementById('deleteErrorMsg');
+    errorEl.style.display = 'none';
+
+    const password = document.getElementById('delete-password').value;
+    if (!password) {
+      errorEl.textContent = 'Please enter your password to confirm.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getCustomerToken()
+        },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Failed to delete account';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      clearCustomerSession();
+      localStorage.removeItem('admin_token');
+      updateAccountButton();
+      closeAuthModal();
+      alert('Your account has been deleted.');
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  async function showAccountPanel() {
+    document.getElementById('authLoggedOut').style.display = 'none';
+    document.getElementById('authLoggedIn').classList.add('active');
+
+    const user = getCustomerUser();
+    document.getElementById('acctName').textContent = user.name;
+    document.getElementById('acctEmail').textContent = user.email;
+
+    const listEl = document.getElementById('acctBookingsList');
+    const bookingsHeading = document.getElementById('acctBookingsHeading');
+
+    // Admins see a dashboard link instead of a personal bookings list
+    if (user.role === 'admin') {
+      if (bookingsHeading) bookingsHeading.textContent = 'Admin';
+      listEl.innerHTML = `
+        <a href="/admin.html" class="auth-submit" style="display:block;text-align:center;text-decoration:none;box-sizing:border-box;">
+          Go to Admin Dashboard
+        </a>
+      `;
+      return;
+    }
+
+    if (bookingsHeading) bookingsHeading.textContent = 'My Bookings';
+    listEl.innerHTML = '<p style="font-size:12px;color:#9a9187;">Loading…</p>';
+
+    try {
+      const res = await fetch('/api/bookings/mine?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + getCustomerToken() },
+        cache: 'no-store'
+      });
+
+      if (res.status === 401) {
+        clearCustomerSession();
+        updateAccountButton();
+        document.getElementById('authLoggedOut').style.display = 'block';
+        document.getElementById('authLoggedIn').classList.remove('active');
+        return;
+      }
+
+      const bookings = await res.json();
+
+      if (bookings.length === 0) {
+        listEl.innerHTML = '<p style="font-size:12px;color:#9a9187;">No bookings yet.</p>';
+        return;
+      }
+
+      // Fetch which completed bookings are still reviewable
+      let reviewableIds = new Set();
+      try {
+        const reviewableRes = await fetch('/api/reviews/reviewable?t=' + Date.now(), {
+          headers: { 'Authorization': 'Bearer ' + getCustomerToken() },
+          cache: 'no-store'
+        });
+        if (reviewableRes.ok) {
+          const reviewable = await reviewableRes.json();
+          reviewableIds = new Set(reviewable.map(b => b.id));
+        }
+      } catch (e) { /* fail silently, just won't show review buttons */ }
+
+      listEl.innerHTML = bookings.map(b => {
+        const date = new Date(b.start_date).toLocaleString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago'
+        });
+
+        const showReviewBtn = reviewableIds.has(b.id);
+        const escapedService = b.service.replace(/'/g, "\\'");
+
+        return `
+          <div class="account-booking-item">
+            <div class="b-service">${b.service}</div>
+            <div class="b-date">${date}</div>
+            <div class="b-status-row">
+              <span class="b-status b-status-${b.status}">${b.status}</span>
+              ${showReviewBtn ? `<button class="r-review-btn" onclick="openReviewView(${b.id}, '${escapedService}')">Leave a Review</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      listEl.innerHTML = '<p style="font-size:12px;color:#9a9187;">Failed to load bookings.</p>';
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // REVIEWS
+  // ─────────────────────────────────────────
+  let currentReviewBookingId = null;
+  let currentReviewRating = 0;
+
+  function openReviewView(bookingId, serviceName) {
+    currentReviewBookingId = bookingId;
+    currentReviewRating = 0;
+
+    document.getElementById('reviewServiceLabel').textContent = serviceName;
+    document.getElementById('review-comment').value = '';
+    document.getElementById('reviewErrorMsg').style.display = 'none';
+    renderStars(0);
+
+    document.getElementById('acctMainView').style.display = 'none';
+    document.getElementById('acctReviewView').style.display = 'block';
+  }
+
+  function closeReviewView() {
+    document.getElementById('acctReviewView').style.display = 'none';
+    document.getElementById('acctMainView').style.display = 'block';
+  }
+
+  function renderStars(rating) {
+    document.querySelectorAll('#starRating .star').forEach(star => {
+      const val = parseInt(star.getAttribute('data-value'));
+      star.classList.toggle('active', val <= rating);
+    });
+  }
+
+  document.getElementById('starRating').addEventListener('click', (e) => {
+    if (!e.target.classList.contains('star')) return;
+    currentReviewRating = parseInt(e.target.getAttribute('data-value'));
+    renderStars(currentReviewRating);
+  });
+
+  async function submitReview() {
+    const errorEl = document.getElementById('reviewErrorMsg');
+    errorEl.style.display = 'none';
+
+    if (currentReviewRating === 0) {
+      errorEl.textContent = 'Please select a star rating.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    const comment = document.getElementById('review-comment').value.trim();
+
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getCustomerToken()
+        },
+        body: JSON.stringify({
+          bookingId: currentReviewBookingId,
+          rating: currentReviewRating,
+          comment
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorEl.textContent = data.error || 'Failed to submit review';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      closeReviewView();
+      showAccountPanel();
+      alert('Thanks for your review!');
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  updateAccountButton();
+
+  // ─────────────────────────────────────────
+  // PUBLIC REVIEWS DISPLAY
+  // ─────────────────────────────────────────
+  async function loadPublicReviews() {
+    const grid = document.getElementById('reviewsGrid');
+    try {
+      const res = await fetch('/api/reviews');
+      const reviews = await res.json();
+
+      if (!res.ok || reviews.length === 0) {
+        grid.innerHTML = '<p class="reviews-empty">No reviews yet. Be the first!</p>';
+        return;
+      }
+
+      grid.innerHTML = reviews.map(r => {
+        const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+        const date = new Date(r.created_at).toLocaleDateString('en-US', {
+          month: 'short', year: 'numeric'
+        });
+        return `
+          <div class="review-card">
+            <div class="review-stars">${stars}</div>
+            ${r.comment ? `<p class="review-comment">"${r.comment}"</p>` : ''}
+            <div class="review-meta">
+              <span>${r.customer_name}</span>
+              <span>${date}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      grid.innerHTML = '<p class="reviews-empty">Failed to load reviews.</p>';
+    }
+  }
+
+  loadPublicReviews();
+</script>
 <script src="script.js"></script>
 
 </body>
