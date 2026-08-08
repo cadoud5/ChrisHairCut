@@ -18,6 +18,7 @@ function openModal(service) {
   document.getElementById('modalOverlay').classList.add('open');
   document.getElementById('modalForm').classList.remove('hidden');
   document.getElementById('modalSuccess').classList.remove('visible');
+  document.getElementById('postBookingAccountPrompt').style.display = 'none';
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Confirm Booking Request';
   btn.disabled = false;
@@ -153,11 +154,38 @@ async function submitForm(e) {
     document.getElementById('modalForm').classList.add('hidden');
     document.getElementById('modalSuccess').classList.add('visible');
 
+    // If this booking was made as a guest, offer to create an account
+    const promptEl = document.getElementById('postBookingAccountPrompt');
+    if (!token) {
+      lastGuestBookingInfo = { name, email, phone };
+      promptEl.style.display = 'block';
+    } else {
+      promptEl.style.display = 'none';
+    }
+
   } catch(err) {
     console.error(err);
     btn.textContent = 'Confirm Booking Request';
     btn.disabled = false;
     alert('Something went wrong. Please email chrishaircut07@gmail.com to book your appointment. Sorry for the inconvenience.');
+  }
+}
+
+// Stores the guest's info temporarily so we can pre-fill the signup form
+// if they choose to create an account right after booking
+let lastGuestBookingInfo = null;
+
+function openAccountPromptSignup() {
+  closeModal();
+  openAuthModal();
+  switchAuthTab('signup');
+
+  if (lastGuestBookingInfo) {
+    const [first, ...rest] = lastGuestBookingInfo.name.split(' ');
+    document.getElementById('signup-fname').value = first || '';
+    document.getElementById('signup-lname').value = rest.join(' ') || '';
+    document.getElementById('signup-email').value = lastGuestBookingInfo.email || '';
+    document.getElementById('signup-phone').value = lastGuestBookingInfo.phone || '';
   }
 }
 

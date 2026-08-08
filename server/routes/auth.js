@@ -47,6 +47,18 @@ router.post('/signup',
       );
 
       const user = result.rows[0];
+
+      // Retroactively link any past guest bookings made with this same email
+      try {
+        await pool.query(
+          'UPDATE bookings SET user_id = $1 WHERE email = $2 AND user_id IS NULL',
+          [user.id, email]
+        );
+      } catch (linkErr) {
+        console.error('Failed to link past bookings on signup:', linkErr.message);
+        // Not fatal — account creation still succeeds even if this step fails
+      }
+
       const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
       res.status(201).json({ user, token });

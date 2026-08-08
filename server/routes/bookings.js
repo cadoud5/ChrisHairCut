@@ -38,7 +38,21 @@ router.post('/',
     if (handleValidation(req, res)) return;
 
     const { name, phone, email, service, price, startDate, endDate, notes } = req.body;
-    const userId = req.user ? req.user.id : null;
+    let userId = req.user ? req.user.id : null;
+
+    // If booking as a guest, check if an account already exists with this email
+    // and auto-link the booking to it — no login required for this to happen.
+    if (!userId) {
+      try {
+        const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        if (existingUser.rows.length > 0) {
+          userId = existingUser.rows[0].id;
+        }
+      } catch (linkErr) {
+        console.error('Failed to check for existing account by email:', linkErr.message);
+        // Not fatal — booking still proceeds as a guest booking if this lookup fails
+      }
+    }
 
   try {
     let calendarEventId = null;
