@@ -139,9 +139,9 @@
 </main>
 
 <!-- REVIEWS -->
-<section id="reviews-section" style="padding: 3rem 1.5rem; display: none">
+<section id="reviews-section" style="padding: 3rem 1.5rem; display: none;">
   <div class="main-wrap" style="padding: 0;">
-    <h2 class="section-heading" style="margin-bottom:1.25rem;">Reviews</h2>
+    <h2 class="section-heading" style="margin-bottom:1.25rem;">What Clients Say</h2>
     <div class="reviews-grid" id="reviewsGrid">
       <p class="reviews-empty">Loading reviews…</p>
     </div>
@@ -152,17 +152,22 @@
 <footer>
   <div class="footer-divider"></div>
   <div class="footer-contact">
-    <a href="mailto:chrishaircut07@gmail.com">chrishaircut07@gmail.com</a>
-    <a href="tel:7738145649">773.814.5649</a>
+    <a href="mailto:cadoud05@gmail.com">cadoud05@gmail.com</a>
+    <a href="tel:7733140148">773.314.0148</a>
   </div>
   <div class="footer-social">
-    <a href="mailto:chrishaircut07@gmail.com" class="social-icon" aria-label="Email">
+    <a href="mailto:cadoud05@gmail.com" class="social-icon" aria-label="Email">
       <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/></svg>
     </a>
     <a href="https://instagram.com/chris_hair_cut/" target="_blank" class="social-icon" aria-label="Instagram">
       <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.1-4.8.1-3.3 1.7-4.8 4.9-4.9 1.3-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 12 5.8zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
     </a>
   </div>
+  <p style="text-align:center; font-size:11px; color:#9a9187; margin-top:1rem;">
+    <a href="/privacy.html" style="color:#9a9187; text-decoration:none;">Privacy Policy</a>
+    &nbsp;·&nbsp;
+    <a href="/terms.html" style="color:#9a9187; text-decoration:none;">Terms of Service</a>
+  </p>
 </footer>
 
 <!-- ACCOUNT / AUTH MODAL -->
@@ -304,7 +309,7 @@
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
-          <p class="modal-title" style="margin-bottom:0;">Account Settings</p>
+          <p class="modal-title" style="margin-bottom:0;">Settings</p>
         </div>
 
         <p class="auth-error" id="settingsErrorMsg"></p>
@@ -349,6 +354,8 @@
 
         <div class="settings-divider"></div>
 
+        <p class="settings-subheading" style="color:#a32d2d;">Danger Zone</p>
+        <p style="font-size:12px;color:#9a9187;margin-bottom:0.75rem;">Deleting your account is permanent and cannot be undone.</p>
         <button class="delete-account-btn" onclick="openDeleteConfirm()">Delete My Account</button>
 
         <div id="deleteConfirmBox" style="display:none;margin-top:0.75rem;">
@@ -436,6 +443,14 @@
       <div class="success-check">✓</div>
       <p class="success-title">Booking Requested!</p>
       <p class="success-msg">Thanks! Chris will confirm your appointment via phone or email shortly.</p>
+
+      <div id="postBookingAccountPrompt" style="display:none; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid #ede7e2;">
+        <p style="font-size:13px; color:#3a3530; margin-bottom:0.75rem;">
+          Create a free account to save your info, track your appointments, and leave reviews — it takes 10 seconds.
+        </p>
+        <button class="auth-submit" style="width:100%;" onclick="openAccountPromptSignup()">Create Account</button>
+        <button class="account-logout-btn" style="width:100%; margin-top:0.5rem;" onclick="closeModal()">No thanks</button>
+      </div>
     </div>
   </div>
 </div>
