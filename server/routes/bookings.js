@@ -5,6 +5,7 @@ const { sendEmail } = require('../emails/mailer');
 const { verifyToken, requireAdmin, optionalAuth } = require('../middleware/auth');
 const { createEvent, deleteEvent, getEvents } = require('../calendar');
 const { body, validationResult } = require('express-validator');
+const { escapeHtml } = require('../utils/escapeHtml');
 
 function handleValidation(req, res) {
   const errors = validationResult(req);
@@ -84,12 +85,12 @@ router.post('/',
       subject: `Appointment Requested — ${dateStr}`,
       html: `
         <h2>Appointment Requested</h2>
-        <p>Hi ${name},</p>
+        <p>Hi ${escapeHtml(name)},</p>
         <p>Thanks for booking! Your appointment request has been received and is <strong>pending confirmation</strong>:</p>
         <ul>
-          <li><strong>Service:</strong> ${service}</li>
+          <li><strong>Service:</strong> ${escapeHtml(service)}</li>
           <li><strong>Date:</strong> ${dateStr}</li>
-          <li><strong>Price:</strong> ${price}</li>
+          <li><strong>Price:</strong> ${escapeHtml(price)}</li>
         </ul>
         <p>You'll receive another email once Chris confirms your appointment.</p>
         <p>Questions? Text or call 773.314.0148.</p>
@@ -102,13 +103,13 @@ router.post('/',
       html: `
         <h2>New appointment requested</h2>
         <ul>
-          <li><strong>Name:</strong> ${name}</li>
-          <li><strong>Phone:</strong> ${phone}</li>
-          <li><strong>Email:</strong> ${email}</li>
-          <li><strong>Service:</strong> ${service}</li>
+          <li><strong>Name:</strong> ${escapeHtml(name)}</li>
+          <li><strong>Phone:</strong> ${escapeHtml(phone)}</li>
+          <li><strong>Email:</strong> ${escapeHtml(email)}</li>
+          <li><strong>Service:</strong> ${escapeHtml(service)}</li>
           <li><strong>Date:</strong> ${dateStr}</li>
-          <li><strong>Price:</strong> ${price}</li>
-          <li><strong>Notes:</strong> ${notes || 'None'}</li>
+          <li><strong>Price:</strong> ${escapeHtml(price)}</li>
+          <li><strong>Notes:</strong> ${notes ? escapeHtml(notes) : 'None'}</li>
         </ul>
       `
     });
@@ -187,12 +188,12 @@ router.patch('/:id',
           subject: `Appointment Confirmed — ${dateStr}`,
           html: `
             <h2>Appointment Confirmed!</h2>
-            <p>Hi ${booking.name},</p>
+            <p>Hi ${escapeHtml(booking.name)},</p>
             <p>Your appointment is <strong>confirmed</strong>:</p>
             <ul>
-              <li><strong>Service:</strong> ${booking.service}</li>
+              <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
               <li><strong>Date:</strong> ${dateStr}</li>
-              <li><strong>Price:</strong> ${booking.price}</li>
+              <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
             </ul>
             <p>See you then! Questions? Text or call 773.314.0148.</p>
           `
@@ -214,10 +215,10 @@ router.patch('/:id',
           subject: `Appointment Cancelled — ${dateStr}`,
           html: `
             <h2>Appointment Cancelled</h2>
-            <p>Hi ${booking.name},</p>
+            <p>Hi ${escapeHtml(booking.name)},</p>
             <p>Your appointment has been <strong>cancelled</strong>:</p>
             <ul>
-              <li><strong>Service:</strong> ${booking.service}</li>
+              <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
               <li><strong>Date:</strong> ${dateStr}</li>
             </ul>
             <p>If this was a mistake or you'd like to rebook, text or call 773.314.0148.</p>

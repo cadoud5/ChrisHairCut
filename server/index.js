@@ -12,7 +12,27 @@ const app = express();
 // Security headers
 // ─────────────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: false, // disabled since it can break inline scripts/styles you already use
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      // NOTE: 'unsafe-inline' is still needed here because index.html/admin.html
+      // use static onclick="..." handlers baked into the markup (Book Now, tabs,
+      // modals, etc). Those aren't attacker-controlled, but they do mean CSP can't
+      // fully stop script injection on its own — the escaping fixes elsewhere are
+      // the real defense. Moving these to addEventListener would let this be tightened
+      // further (drop 'unsafe-inline' from script-src) as a future improvement.
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
+      frameSrc: ['https://www.google.com'], // Google Maps embed
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+    },
+  },
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allows review photos to load correctly
 }));
 

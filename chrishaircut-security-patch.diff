@@ -1,0 +1,450 @@
+diff --git a/public/admin.html b/public/admin.html
+index 0e86cd2..37fe83f 100644
+--- a/public/admin.html
++++ b/public/admin.html
+@@ -38,6 +38,7 @@
+     <div id="reviewsWrap" style="display:none;"></div>
+   </div>
+ 
++  <script src="escape.js"></script>
+   <script src="admin.js"></script>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/public/admin.js b/public/admin.js
+index efbcba9..6cf6c6e 100644
+--- a/public/admin.js
++++ b/public/admin.js
+@@ -56,25 +56,32 @@ function renderTable() {
+       hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago'
+     });
+ 
++    const safeName = escapeHtml(b.name);
++    const safeService = escapeHtml(b.service);
++    const safePhone = escapeHtml(b.phone);
++    const safeEmail = escapeHtml(b.email);
++    const safePrice = escapeHtml(b.price);
++    const safePaid = escapeHtml(b.paid_amount || '');
++
+     const paidBox = b.status === 'completed' ? `
+       <div class="paid-box">
+         <label for="paid-${b.id}">Paid</label>
+         <input type="text" id="paid-${b.id}" placeholder="$0.00"
+-               value="${b.paid_amount || ''}"
+-               onchange="savePaid(${b.id}, this.value)" />
++               value="${safePaid}"
++               data-action="save-paid" data-booking-id="${b.id}" />
+         <span class="paid-saved" id="paid-saved-${b.id}">Saved</span>
+       </div>
+     ` : '';
+ 
+     return `
+       <tr id="row-${b.id}">
+-        <td>${b.name}</td>
+-        <td>${b.service}</td>
++        <td>${safeName}</td>
++        <td>${safeService}</td>
+         <td>${date}</td>
+-        <td>${b.price}</td>
+-        <td>${b.phone}<br><span style="color:#9a9187">${b.email}</span></td>
++        <td>${safePrice}</td>
++        <td>${safePhone}<br><span style="color:#9a9187">${safeEmail}</span></td>
+         <td>
+-          <select class="status-select status-${b.status}" onchange="updateStatus(${b.id}, this.value)">
++          <select class="status-select status-${b.status}" data-action="update-status" data-booking-id="${b.id}">
+             <option value="pending"   ${b.status === 'pending'   ? 'selected' : ''}>Pending</option>
+             <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+             <option value="completed" ${b.status === 'completed' ? 'selected' : ''}>Completed</option>
+@@ -83,7 +90,7 @@ function renderTable() {
+           ${paidBox}
+         </td>
+         <td>
+-          <button class="delete-btn" onclick="deleteBooking(${b.id}, '${b.name.replace(/'/g, "\\'")}')" aria-label="Delete booking">
++          <button class="delete-btn" data-action="delete-booking" data-booking-id="${b.id}" data-booking-name="${safeName}" aria-label="Delete booking">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+               <path d="M3 6h18"/>
+               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+@@ -105,6 +112,24 @@ function renderTable() {
+       <tbody>${rows}</tbody>
+     </table>
+   `;
++
++  // Event wiring — dataset values are already HTML-decoded plain strings,
++  // so nothing here ever gets re-parsed as HTML or JS.
++  wrap.querySelectorAll('[data-action="update-status"]').forEach(el => {
++    el.addEventListener('change', () => {
++      updateStatus(Number(el.dataset.bookingId), el.value);
++    });
++  });
++  wrap.querySelectorAll('[data-action="save-paid"]').forEach(el => {
++    el.addEventListener('change', () => {
++      savePaid(Number(el.dataset.bookingId), el.value);
++    });
++  });
++  wrap.querySelectorAll('[data-action="delete-booking"]').forEach(el => {
++    el.addEventListener('click', () => {
++      deleteBooking(Number(el.dataset.bookingId), el.dataset.bookingName);
++    });
++  });
+ }
+ 
+ async function updateStatus(id, status) {
+@@ -232,24 +257,37 @@ function renderReviews() {
+     const statusBadge = r.approved
+       ? '<span class="review-status-badge review-status-approved">Visible</span>'
+       : '<span class="review-status-badge review-status-hidden">Hidden</span>';
++    const safeComment = escapeHtml(r.comment);
++    const safeName = escapeHtml(r.customer_name);
++    const safeService = escapeHtml(r.service || 'Unknown service');
+ 
+     return `
+       <div class="review-mod-item">
+         <div>
+           <div class="stars">${stars}${statusBadge}</div>
+-          ${r.comment ? `<p class="comment">"${r.comment}"</p>` : '<p class="comment" style="color:#9a9187;">No comment left.</p>'}
+-          <div class="meta">${r.customer_name} · ${r.service || 'Unknown service'} · ${date}</div>
++          ${r.comment ? `<p class="comment">"${safeComment}"</p>` : '<p class="comment" style="color:#9a9187;">No comment left.</p>'}
++          <div class="meta">${safeName} · ${safeService} · ${date}</div>
+         </div>
+         <div class="review-mod-actions">
+           ${r.approved
+-            ? `<button class="hide-btn" onclick="toggleReviewApproval(${r.id}, false)">Hide</button>`
+-            : `<button class="approve-btn" onclick="toggleReviewApproval(${r.id}, true)">Approve</button>`
++            ? `<button class="hide-btn" data-action="hide-review" data-review-id="${r.id}">Hide</button>`
++            : `<button class="approve-btn" data-action="approve-review" data-review-id="${r.id}">Approve</button>`
+           }
+-          <button class="delete-review-btn" onclick="deleteReview(${r.id})">Delete</button>
++          <button class="delete-review-btn" data-action="delete-review" data-review-id="${r.id}">Delete</button>
+         </div>
+       </div>
+     `;
+   }).join('');
++
++  wrap.querySelectorAll('[data-action="hide-review"]').forEach(el => {
++    el.addEventListener('click', () => toggleReviewApproval(Number(el.dataset.reviewId), false));
++  });
++  wrap.querySelectorAll('[data-action="approve-review"]').forEach(el => {
++    el.addEventListener('click', () => toggleReviewApproval(Number(el.dataset.reviewId), true));
++  });
++  wrap.querySelectorAll('[data-action="delete-review"]').forEach(el => {
++    el.addEventListener('click', () => deleteReview(Number(el.dataset.reviewId)));
++  });
+ }
+ 
+ async function toggleReviewApproval(id, approved) {
+diff --git a/public/escape.js b/public/escape.js
+new file mode 100644
+index 0000000..70a780b
+--- /dev/null
++++ b/public/escape.js
+@@ -0,0 +1,12 @@
++// Shared HTML-escaping helper.
++// Any user-supplied value (names, review comments, service labels, etc.)
++// must be passed through this before being inserted into innerHTML.
++function escapeHtml(value) {
++  if (value === null || value === undefined) return '';
++  return String(value)
++    .replace(/&/g, '&amp;')
++    .replace(/</g, '&lt;')
++    .replace(/>/g, '&gt;')
++    .replace(/"/g, '&quot;')
++    .replace(/'/g, '&#39;');
++}
+diff --git a/public/index.html b/public/index.html
+index 2d9e8d7..496595f 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -455,6 +455,7 @@
+   </div>
+ </div>
+ 
++<script src="escape.js"></script>
+ <script src="script.js"></script>
+ 
+ </body>
+diff --git a/public/script.js b/public/script.js
+index d11d656..72c9abf 100644
+--- a/public/script.js
++++ b/public/script.js
+@@ -708,24 +708,26 @@ async function showAccountPanel() {
+ 
+       const showReviewBtn = reviewableIds.has(b.id);
+       const existingReview = myReviewsByBooking[b.id];
+-      const escapedService = b.service.replace(/'/g, "\\'");
++      const safeService = escapeHtml(b.service);
+ 
+       let reviewBlock = '';
+       if (showReviewBtn) {
+-        reviewBlock = `<button class="r-review-btn" onclick="openReviewView(${b.id}, '${escapedService}')">Leave a Review</button>`;
++        // Use data-* attributes instead of inline onclick with interpolated
++        // strings — avoids any HTML/JS-string escaping edge cases.
++        reviewBlock = `<button class="r-review-btn" data-action="open-review" data-booking-id="${b.id}" data-service="${safeService}">Leave a Review</button>`;
+       } else if (existingReview) {
+         const stars = '★'.repeat(existingReview.rating) + '☆'.repeat(5 - existingReview.rating);
+         reviewBlock = `
+           <div class="my-review-block">
+             <span class="my-review-stars">${stars}</span>
+-            <button class="r-delete-review-btn" onclick="deleteMyReview(${existingReview.id})">Delete Review</button>
++            <button class="r-delete-review-btn" data-action="delete-my-review" data-review-id="${existingReview.id}">Delete Review</button>
+           </div>
+         `;
+       }
+ 
+       return `
+         <div class="account-booking-item">
+-          <div class="b-service">${b.service}</div>
++          <div class="b-service">${safeService}</div>
+           <div class="b-date">${date}</div>
+           <div class="b-status-row">
+             <span class="b-status b-status-${b.status}">${b.status}</span>
+@@ -734,6 +736,19 @@ async function showAccountPanel() {
+         </div>
+       `;
+     }).join('');
++
++    // Wire up buttons rendered above (data attributes are already HTML-decoded
++    // by the browser, so no further escaping/parsing of untrusted text happens here).
++    listEl.querySelectorAll('[data-action="open-review"]').forEach(btn => {
++      btn.addEventListener('click', () => {
++        openReviewView(Number(btn.dataset.bookingId), btn.dataset.service);
++      });
++    });
++    listEl.querySelectorAll('[data-action="delete-my-review"]').forEach(btn => {
++      btn.addEventListener('click', () => {
++        deleteMyReview(Number(btn.dataset.reviewId));
++      });
++    });
+   } catch (err) {
+     listEl.innerHTML = '<p style="font-size:12px;color:#9a9187;">Failed to load bookings.</p>';
+   }
+@@ -761,13 +776,16 @@ async function loadPublicReviews() {
+       const date = new Date(r.created_at).toLocaleDateString('en-US', {
+         month: 'short', year: 'numeric'
+       });
++      const safeName = escapeHtml(r.customer_name);
++      const safeComment = escapeHtml(r.comment);
++      const safePhoto = escapeHtml(r.photo_url);
+       return `
+         <div class="review-card">
+-          ${r.photo_url ? `<img src="${r.photo_url}" class="review-card-photo" alt="Photo from ${r.customer_name}'s review" />` : ''}
++          ${r.photo_url ? `<img src="${safePhoto}" class="review-card-photo" alt="Photo from ${safeName}'s review" />` : ''}
+           <div class="review-stars">${stars}</div>
+-          ${r.comment ? `<p class="review-comment">"${r.comment}"</p>` : ''}
++          ${r.comment ? `<p class="review-comment">"${safeComment}"</p>` : ''}
+           <div class="review-meta">
+-            <span>${r.customer_name}</span>
++            <span>${safeName}</span>
+             <span>${date}</span>
+           </div>
+         </div>
+diff --git a/server/cron/reminders.js b/server/cron/reminders.js
+index 16387eb..f237903 100644
+--- a/server/cron/reminders.js
++++ b/server/cron/reminders.js
+@@ -1,6 +1,7 @@
+ const cron = require('node-cron');
+ const pool = require('../db');
+ const { sendEmail } = require('../emails/mailer');
++const { escapeHtml } = require('../utils/escapeHtml');
+ 
+ function readableDate(dateStr) {
+   return new Date(dateStr).toLocaleString('en-US', {
+@@ -37,12 +38,12 @@ async function sendReminders() {
+         subject: `Reminder: Your appointment tomorrow — ${dateStr}`,
+         html: `
+           <h2>Appointment Reminder</h2>
+-          <p>Hi ${booking.name},</p>
++          <p>Hi ${escapeHtml(booking.name)},</p>
+           <p>Just a reminder that you have an appointment <strong>tomorrow</strong>:</p>
+           <ul>
+-            <li><strong>Service:</strong> ${booking.service}</li>
++            <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
+             <li><strong>Date:</strong> ${dateStr}</li>
+-            <li><strong>Price:</strong> ${booking.price}</li>
++            <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
+           </ul>
+           <p>See you then! Questions? Text or call 773.314.0148.</p>
+         `
+@@ -55,13 +56,13 @@ async function sendReminders() {
+         html: `
+           <h2>Upcoming appointment tomorrow</h2>
+           <ul>
+-            <li><strong>Name:</strong> ${booking.name}</li>
+-            <li><strong>Phone:</strong> ${booking.phone}</li>
+-            <li><strong>Email:</strong> ${booking.email}</li>
+-            <li><strong>Service:</strong> ${booking.service}</li>
++            <li><strong>Name:</strong> ${escapeHtml(booking.name)}</li>
++            <li><strong>Phone:</strong> ${escapeHtml(booking.phone)}</li>
++            <li><strong>Email:</strong> ${escapeHtml(booking.email)}</li>
++            <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
+             <li><strong>Date:</strong> ${dateStr}</li>
+-            <li><strong>Price:</strong> ${booking.price}</li>
+-            <li><strong>Notes:</strong> ${booking.notes || 'None'}</li>
++            <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
++            <li><strong>Notes:</strong> ${booking.notes ? escapeHtml(booking.notes) : 'None'}</li>
+           </ul>
+         `
+       });
+diff --git a/server/index.js b/server/index.js
+index d646e5c..24e3f87 100644
+--- a/server/index.js
++++ b/server/index.js
+@@ -12,7 +12,27 @@ const app = express();
+ // Security headers
+ // ─────────────────────────────────────────
+ app.use(helmet({
+-  contentSecurityPolicy: false, // disabled since it can break inline scripts/styles you already use
++  contentSecurityPolicy: {
++    directives: {
++      defaultSrc: ["'self'"],
++      // NOTE: 'unsafe-inline' is still needed here because index.html/admin.html
++      // use static onclick="..." handlers baked into the markup (Book Now, tabs,
++      // modals, etc). Those aren't attacker-controlled, but they do mean CSP can't
++      // fully stop script injection on its own — the escaping fixes elsewhere are
++      // the real defense. Moving these to addEventListener would let this be tightened
++      // further (drop 'unsafe-inline' from script-src) as a future improvement.
++      scriptSrc: ["'self'", "'unsafe-inline'"],
++      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
++      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
++      imgSrc: ["'self'", 'data:'],
++      connectSrc: ["'self'"],
++      frameSrc: ['https://www.google.com'], // Google Maps embed
++      objectSrc: ["'none'"],
++      baseUri: ["'self'"],
++      formAction: ["'self'"],
++      frameAncestors: ["'self'"],
++    },
++  },
+   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allows review photos to load correctly
+ }));
+ 
+diff --git a/server/routes/bookings.js b/server/routes/bookings.js
+index 4a4087c..aceccff 100644
+--- a/server/routes/bookings.js
++++ b/server/routes/bookings.js
+@@ -5,6 +5,7 @@ const { sendEmail } = require('../emails/mailer');
+ const { verifyToken, requireAdmin, optionalAuth } = require('../middleware/auth');
+ const { createEvent, deleteEvent, getEvents } = require('../calendar');
+ const { body, validationResult } = require('express-validator');
++const { escapeHtml } = require('../utils/escapeHtml');
+ 
+ function handleValidation(req, res) {
+   const errors = validationResult(req);
+@@ -84,12 +85,12 @@ router.post('/',
+       subject: `Appointment Requested — ${dateStr}`,
+       html: `
+         <h2>Appointment Requested</h2>
+-        <p>Hi ${name},</p>
++        <p>Hi ${escapeHtml(name)},</p>
+         <p>Thanks for booking! Your appointment request has been received and is <strong>pending confirmation</strong>:</p>
+         <ul>
+-          <li><strong>Service:</strong> ${service}</li>
++          <li><strong>Service:</strong> ${escapeHtml(service)}</li>
+           <li><strong>Date:</strong> ${dateStr}</li>
+-          <li><strong>Price:</strong> ${price}</li>
++          <li><strong>Price:</strong> ${escapeHtml(price)}</li>
+         </ul>
+         <p>You'll receive another email once Chris confirms your appointment.</p>
+         <p>Questions? Text or call 773.314.0148.</p>
+@@ -102,13 +103,13 @@ router.post('/',
+       html: `
+         <h2>New appointment requested</h2>
+         <ul>
+-          <li><strong>Name:</strong> ${name}</li>
+-          <li><strong>Phone:</strong> ${phone}</li>
+-          <li><strong>Email:</strong> ${email}</li>
+-          <li><strong>Service:</strong> ${service}</li>
++          <li><strong>Name:</strong> ${escapeHtml(name)}</li>
++          <li><strong>Phone:</strong> ${escapeHtml(phone)}</li>
++          <li><strong>Email:</strong> ${escapeHtml(email)}</li>
++          <li><strong>Service:</strong> ${escapeHtml(service)}</li>
+           <li><strong>Date:</strong> ${dateStr}</li>
+-          <li><strong>Price:</strong> ${price}</li>
+-          <li><strong>Notes:</strong> ${notes || 'None'}</li>
++          <li><strong>Price:</strong> ${escapeHtml(price)}</li>
++          <li><strong>Notes:</strong> ${notes ? escapeHtml(notes) : 'None'}</li>
+         </ul>
+       `
+     });
+@@ -187,12 +188,12 @@ router.patch('/:id',
+           subject: `Appointment Confirmed — ${dateStr}`,
+           html: `
+             <h2>Appointment Confirmed!</h2>
+-            <p>Hi ${booking.name},</p>
++            <p>Hi ${escapeHtml(booking.name)},</p>
+             <p>Your appointment is <strong>confirmed</strong>:</p>
+             <ul>
+-              <li><strong>Service:</strong> ${booking.service}</li>
++              <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
+               <li><strong>Date:</strong> ${dateStr}</li>
+-              <li><strong>Price:</strong> ${booking.price}</li>
++              <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
+             </ul>
+             <p>See you then! Questions? Text or call 773.314.0148.</p>
+           `
+@@ -214,10 +215,10 @@ router.patch('/:id',
+           subject: `Appointment Cancelled — ${dateStr}`,
+           html: `
+             <h2>Appointment Cancelled</h2>
+-            <p>Hi ${booking.name},</p>
++            <p>Hi ${escapeHtml(booking.name)},</p>
+             <p>Your appointment has been <strong>cancelled</strong>:</p>
+             <ul>
+-              <li><strong>Service:</strong> ${booking.service}</li>
++              <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
+               <li><strong>Date:</strong> ${dateStr}</li>
+             </ul>
+             <p>If this was a mistake or you'd like to rebook, text or call 773.314.0148.</p>
+diff --git a/server/routes/reviews.js b/server/routes/reviews.js
+index 1214bdf..777dc11 100644
+--- a/server/routes/reviews.js
++++ b/server/routes/reviews.js
+@@ -11,18 +11,27 @@ const fs = require('fs');
+ // ─────────────────────────────────────────
+ const uploadDir = path.join(__dirname, '../../public/uploads/reviews');
+ 
++// Map allowed mimetypes to a fixed, safe extension — we never trust the
++// client-supplied original filename/extension directly, since both the
++// filename and the mimetype header are attacker-controlled.
++const ALLOWED_MIME_TO_EXT = {
++  'image/jpeg': '.jpg',
++  'image/png': '.png',
++  'image/webp': '.webp',
++  'image/gif': '.gif',
++};
++
+ const storage = multer.diskStorage({
+   destination: (req, file, cb) => cb(null, uploadDir),
+   filename: (req, file, cb) => {
+-    const ext = path.extname(file.originalname);
++    const ext = ALLOWED_MIME_TO_EXT[file.mimetype] || '.bin';
+     const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+     cb(null, 'review-' + unique + ext);
+   }
+ });
+ 
+ function fileFilter(req, file, cb) {
+-  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+-  if (allowed.includes(file.mimetype)) {
++  if (Object.prototype.hasOwnProperty.call(ALLOWED_MIME_TO_EXT, file.mimetype)) {
+     cb(null, true);
+   } else {
+     cb(new Error('Only image files are allowed'));
+diff --git a/server/utils/escapeHtml.js b/server/utils/escapeHtml.js
+new file mode 100644
+index 0000000..da656ed
+--- /dev/null
++++ b/server/utils/escapeHtml.js
+@@ -0,0 +1,12 @@
++// Escapes user-supplied text before it's interpolated into HTML email bodies.
++function escapeHtml(value) {
++  if (value === null || value === undefined) return '';
++  return String(value)
++    .replace(/&/g, '&amp;')
++    .replace(/</g, '&lt;')
++    .replace(/>/g, '&gt;')
++    .replace(/"/g, '&quot;')
++    .replace(/'/g, '&#39;');
++}
++
++module.exports = { escapeHtml };

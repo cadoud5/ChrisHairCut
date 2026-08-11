@@ -708,24 +708,26 @@ async function showAccountPanel() {
 
       const showReviewBtn = reviewableIds.has(b.id);
       const existingReview = myReviewsByBooking[b.id];
-      const escapedService = b.service.replace(/'/g, "\\'");
+      const safeService = escapeHtml(b.service);
 
       let reviewBlock = '';
       if (showReviewBtn) {
-        reviewBlock = `<button class="r-review-btn" onclick="openReviewView(${b.id}, '${escapedService}')">Leave a Review</button>`;
+        // Use data-* attributes instead of inline onclick with interpolated
+        // strings — avoids any HTML/JS-string escaping edge cases.
+        reviewBlock = `<button class="r-review-btn" data-action="open-review" data-booking-id="${b.id}" data-service="${safeService}">Leave a Review</button>`;
       } else if (existingReview) {
         const stars = '★'.repeat(existingReview.rating) + '☆'.repeat(5 - existingReview.rating);
         reviewBlock = `
           <div class="my-review-block">
             <span class="my-review-stars">${stars}</span>
-            <button class="r-delete-review-btn" onclick="deleteMyReview(${existingReview.id})">Delete Review</button>
+            <button class="r-delete-review-btn" data-action="delete-my-review" data-review-id="${existingReview.id}">Delete Review</button>
           </div>
         `;
       }
 
       return `
         <div class="account-booking-item">
-          <div class="b-service">${b.service}</div>
+          <div class="b-service">${safeService}</div>
           <div class="b-date">${date}</div>
           <div class="b-status-row">
             <span class="b-status b-status-${b.status}">${b.status}</span>
@@ -734,6 +736,19 @@ async function showAccountPanel() {
         </div>
       `;
     }).join('');
+
+    // Wire up buttons rendered above (data attributes are already HTML-decoded
+    // by the browser, so no further escaping/parsing of untrusted text happens here).
+    listEl.querySelectorAll('[data-action="open-review"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        openReviewView(Number(btn.dataset.bookingId), btn.dataset.service);
+      });
+    });
+    listEl.querySelectorAll('[data-action="delete-my-review"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteMyReview(Number(btn.dataset.reviewId));
+      });
+    });
   } catch (err) {
     listEl.innerHTML = '<p style="font-size:12px;color:#9a9187;">Failed to load bookings.</p>';
   }
@@ -761,13 +776,16 @@ async function loadPublicReviews() {
       const date = new Date(r.created_at).toLocaleDateString('en-US', {
         month: 'short', year: 'numeric'
       });
+      const safeName = escapeHtml(r.customer_name);
+      const safeComment = escapeHtml(r.comment);
+      const safePhoto = escapeHtml(r.photo_url);
       return `
         <div class="review-card">
-          ${r.photo_url ? `<img src="${r.photo_url}" class="review-card-photo" alt="Photo from ${r.customer_name}'s review" />` : ''}
+          ${r.photo_url ? `<img src="${safePhoto}" class="review-card-photo" alt="Photo from ${safeName}'s review" />` : ''}
           <div class="review-stars">${stars}</div>
-          ${r.comment ? `<p class="review-comment">"${r.comment}"</p>` : ''}
+          ${r.comment ? `<p class="review-comment">"${safeComment}"</p>` : ''}
           <div class="review-meta">
-            <span>${r.customer_name}</span>
+            <span>${safeName}</span>
             <span>${date}</span>
           </div>
         </div>

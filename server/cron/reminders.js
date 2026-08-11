@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const pool = require('../db');
 const { sendEmail } = require('../emails/mailer');
+const { escapeHtml } = require('../utils/escapeHtml');
 
 function readableDate(dateStr) {
   return new Date(dateStr).toLocaleString('en-US', {
@@ -37,12 +38,12 @@ async function sendReminders() {
         subject: `Reminder: Your appointment tomorrow — ${dateStr}`,
         html: `
           <h2>Appointment Reminder</h2>
-          <p>Hi ${booking.name},</p>
+          <p>Hi ${escapeHtml(booking.name)},</p>
           <p>Just a reminder that you have an appointment <strong>tomorrow</strong>:</p>
           <ul>
-            <li><strong>Service:</strong> ${booking.service}</li>
+            <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
             <li><strong>Date:</strong> ${dateStr}</li>
-            <li><strong>Price:</strong> ${booking.price}</li>
+            <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
           </ul>
           <p>See you then! Questions? Text or call 773.314.0148.</p>
         `
@@ -55,13 +56,13 @@ async function sendReminders() {
         html: `
           <h2>Upcoming appointment tomorrow</h2>
           <ul>
-            <li><strong>Name:</strong> ${booking.name}</li>
-            <li><strong>Phone:</strong> ${booking.phone}</li>
-            <li><strong>Email:</strong> ${booking.email}</li>
-            <li><strong>Service:</strong> ${booking.service}</li>
+            <li><strong>Name:</strong> ${escapeHtml(booking.name)}</li>
+            <li><strong>Phone:</strong> ${escapeHtml(booking.phone)}</li>
+            <li><strong>Email:</strong> ${escapeHtml(booking.email)}</li>
+            <li><strong>Service:</strong> ${escapeHtml(booking.service)}</li>
             <li><strong>Date:</strong> ${dateStr}</li>
-            <li><strong>Price:</strong> ${booking.price}</li>
-            <li><strong>Notes:</strong> ${booking.notes || 'None'}</li>
+            <li><strong>Price:</strong> ${escapeHtml(booking.price)}</li>
+            <li><strong>Notes:</strong> ${booking.notes ? escapeHtml(booking.notes) : 'None'}</li>
           </ul>
         `
       });

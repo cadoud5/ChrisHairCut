@@ -56,25 +56,32 @@ function renderTable() {
       hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago'
     });
 
+    const safeName = escapeHtml(b.name);
+    const safeService = escapeHtml(b.service);
+    const safePhone = escapeHtml(b.phone);
+    const safeEmail = escapeHtml(b.email);
+    const safePrice = escapeHtml(b.price);
+    const safePaid = escapeHtml(b.paid_amount || '');
+
     const paidBox = b.status === 'completed' ? `
       <div class="paid-box">
         <label for="paid-${b.id}">Paid</label>
         <input type="text" id="paid-${b.id}" placeholder="$0.00"
-               value="${b.paid_amount || ''}"
-               onchange="savePaid(${b.id}, this.value)" />
+               value="${safePaid}"
+               data-action="save-paid" data-booking-id="${b.id}" />
         <span class="paid-saved" id="paid-saved-${b.id}">Saved</span>
       </div>
     ` : '';
 
     return `
       <tr id="row-${b.id}">
-        <td>${b.name}</td>
-        <td>${b.service}</td>
+        <td>${safeName}</td>
+        <td>${safeService}</td>
         <td>${date}</td>
-        <td>${b.price}</td>
-        <td>${b.phone}<br><span style="color:#9a9187">${b.email}</span></td>
+        <td>${safePrice}</td>
+        <td>${safePhone}<br><span style="color:#9a9187">${safeEmail}</span></td>
         <td>
-          <select class="status-select status-${b.status}" onchange="updateStatus(${b.id}, this.value)">
+          <select class="status-select status-${b.status}" data-action="update-status" data-booking-id="${b.id}">
             <option value="pending"   ${b.status === 'pending'   ? 'selected' : ''}>Pending</option>
             <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
             <option value="completed" ${b.status === 'completed' ? 'selected' : ''}>Completed</option>
@@ -83,7 +90,7 @@ function renderTable() {
           ${paidBox}
         </td>
         <td>
-          <button class="delete-btn" onclick="deleteBooking(${b.id}, '${b.name.replace(/'/g, "\\'")}')" aria-label="Delete booking">
+          <button class="delete-btn" data-action="delete-booking" data-booking-id="${b.id}" data-booking-name="${safeName}" aria-label="Delete booking">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M3 6h18"/>
               <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -105,6 +112,24 @@ function renderTable() {
       <tbody>${rows}</tbody>
     </table>
   `;
+
+  // Event wiring — dataset values are already HTML-decoded plain strings,
+  // so nothing here ever gets re-parsed as HTML or JS.
+  wrap.querySelectorAll('[data-action="update-status"]').forEach(el => {
+    el.addEventListener('change', () => {
+      updateStatus(Number(el.dataset.bookingId), el.value);
+    });
+  });
+  wrap.querySelectorAll('[data-action="save-paid"]').forEach(el => {
+    el.addEventListener('change', () => {
+      savePaid(Number(el.dataset.bookingId), el.value);
+    });
+  });
+  wrap.querySelectorAll('[data-action="delete-booking"]').forEach(el => {
+    el.addEventListener('click', () => {
+      deleteBooking(Number(el.dataset.bookingId), el.dataset.bookingName);
+    });
+  });
 }
 
 async function updateStatus(id, status) {
@@ -232,24 +257,37 @@ function renderReviews() {
     const statusBadge = r.approved
       ? '<span class="review-status-badge review-status-approved">Visible</span>'
       : '<span class="review-status-badge review-status-hidden">Hidden</span>';
+    const safeComment = escapeHtml(r.comment);
+    const safeName = escapeHtml(r.customer_name);
+    const safeService = escapeHtml(r.service || 'Unknown service');
 
     return `
       <div class="review-mod-item">
         <div>
           <div class="stars">${stars}${statusBadge}</div>
-          ${r.comment ? `<p class="comment">"${r.comment}"</p>` : '<p class="comment" style="color:#9a9187;">No comment left.</p>'}
-          <div class="meta">${r.customer_name} · ${r.service || 'Unknown service'} · ${date}</div>
+          ${r.comment ? `<p class="comment">"${safeComment}"</p>` : '<p class="comment" style="color:#9a9187;">No comment left.</p>'}
+          <div class="meta">${safeName} · ${safeService} · ${date}</div>
         </div>
         <div class="review-mod-actions">
           ${r.approved
-            ? `<button class="hide-btn" onclick="toggleReviewApproval(${r.id}, false)">Hide</button>`
-            : `<button class="approve-btn" onclick="toggleReviewApproval(${r.id}, true)">Approve</button>`
+            ? `<button class="hide-btn" data-action="hide-review" data-review-id="${r.id}">Hide</button>`
+            : `<button class="approve-btn" data-action="approve-review" data-review-id="${r.id}">Approve</button>`
           }
-          <button class="delete-review-btn" onclick="deleteReview(${r.id})">Delete</button>
+          <button class="delete-review-btn" data-action="delete-review" data-review-id="${r.id}">Delete</button>
         </div>
       </div>
     `;
   }).join('');
+
+  wrap.querySelectorAll('[data-action="hide-review"]').forEach(el => {
+    el.addEventListener('click', () => toggleReviewApproval(Number(el.dataset.reviewId), false));
+  });
+  wrap.querySelectorAll('[data-action="approve-review"]').forEach(el => {
+    el.addEventListener('click', () => toggleReviewApproval(Number(el.dataset.reviewId), true));
+  });
+  wrap.querySelectorAll('[data-action="delete-review"]').forEach(el => {
+    el.addEventListener('click', () => deleteReview(Number(el.dataset.reviewId)));
+  });
 }
 
 async function toggleReviewApproval(id, approved) {

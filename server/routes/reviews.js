@@ -11,18 +11,27 @@ const fs = require('fs');
 // ─────────────────────────────────────────
 const uploadDir = path.join(__dirname, '../../public/uploads/reviews');
 
+// Map allowed mimetypes to a fixed, safe extension — we never trust the
+// client-supplied original filename/extension directly, since both the
+// filename and the mimetype header are attacker-controlled.
+const ALLOWED_MIME_TO_EXT = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
+    const ext = ALLOWED_MIME_TO_EXT[file.mimetype] || '.bin';
     const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, 'review-' + unique + ext);
   }
 });
 
 function fileFilter(req, file, cb) {
-  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-  if (allowed.includes(file.mimetype)) {
+  if (Object.prototype.hasOwnProperty.call(ALLOWED_MIME_TO_EXT, file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Only image files are allowed'));
