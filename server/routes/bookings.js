@@ -34,6 +34,7 @@ router.post('/',
     body('startDate').isISO8601().withMessage('Invalid start date'),
     body('endDate').isISO8601().withMessage('Invalid end date'),
     body('notes').optional({ checkFalsy: true }).trim().isLength({ max: 1000 }).withMessage('Notes are too long'),
+    body('agreedToTerms').custom(value => value === true).withMessage('You must agree to the Terms of Service to book an appointment'),
   ],
   async (req, res) => {
     if (handleValidation(req, res)) return;

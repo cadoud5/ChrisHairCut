@@ -159,6 +159,7 @@ async function submitForm(e) {
         startDate: startDateTime,
         endDate: endDateTime,
         notes,
+        agreedToTerms: document.getElementById('m-agree-terms').checked,
       })
     });
 
@@ -317,7 +318,7 @@ async function customerSignup(e) {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, phone, password })
+      body: JSON.stringify({ name, email, phone, password, agreedToTerms: document.getElementById('signup-agree-terms').checked })
     });
     const data = await res.json();
 

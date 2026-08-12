@@ -25,6 +25,7 @@ router.post('/signup',
     body('email').trim().isEmail().withMessage('Please enter a valid email').normalizeEmail(),
     body('password').isLength({ min: 6, max: 128 }).withMessage('Password must be at least 6 characters'),
     body('phone').optional({ checkFalsy: true }).trim().isLength({ max: 20 }).withMessage('Phone number is too long'),
+    body('agreedToTerms').custom(value => value === true).withMessage('You must agree to the Terms of Service to create an account'),
   ],
   async (req, res) => {
     if (handleValidation(req, res)) return;

@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#000000" />
   <title>Chris Hair Cut</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -224,6 +225,12 @@
             <label for="signup-password">Password</label>
             <input type="password" id="signup-password" placeholder="••••••••" required minlength="6" />
           </div>
+          <div class="form-group form-group-checkbox">
+            <label class="checkbox-label">
+              <input type="checkbox" id="signup-agree-terms" required />
+              <span>I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a></span>
+            </label>
+          </div>
           <button type="submit" class="auth-submit">Create Account</button>
         </form>
       </div>
@@ -434,6 +441,12 @@
         <div class="form-group">
           <label for="m-notes">Notes (optional)</label>
           <textarea id="m-notes" placeholder="Any requests or questions…"></textarea>
+        </div>
+        <div class="form-group form-group-checkbox">
+          <label class="checkbox-label">
+            <input type="checkbox" id="m-agree-terms" required />
+            <span>I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a></span>
+          </label>
         </div>
         <button type="submit" id="submitBtn" class="modal-submit">Confirm Booking Request</button>
       </form>
