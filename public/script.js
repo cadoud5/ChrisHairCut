@@ -1,3 +1,16 @@
+// HTML-escaping helper — any user-supplied value (names, review comments,
+// service labels, etc.) must be passed through this before being inserted
+// into innerHTML.
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const dayMap = ['sun','mon','tue','wed','thu','fri','sat'];
 const todayKey = dayMap[new Date().getDay()];
 const row = document.getElementById('row-' + todayKey);
@@ -170,22 +183,6 @@ async function submitForm(e) {
     alert('Something went wrong. Please email chrishaircut07@gmail.com to book your appointment. Sorry for the inconvenience.');
   }
 }
-
-//HTML-escaping (previously public/escape.js)
-// Any user-supplied value (names, review comments, service labels, etc.)
-// must be passed through this before being inserted into innerHTML.
-function escapeHtml(value) {
-  if (value === null || value === undefined) return '';
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-
-
 
 // Stores the guest's info temporarily so we can pre-fill the signup form
 // if they choose to create an account right after booking

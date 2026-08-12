@@ -1,0 +1,97 @@
+const express = require('express');
+const cors    = require('cors');
+const path    = require('path');
+const helmet  = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+const app = express();
+
+// ─────────────────────────────────────────
+// Security headers
+// ─────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      // NOTE: 'unsafe-inline' is still needed here because index.html/admin.html
+      // use static onclick="..." handlers baked into the markup (Book Now, tabs,
+      // modals, etc). Those aren't attacker-controlled, but they do mean CSP can't
+      // fully stop script injection on its own — the escaping fixes elsewhere are
+      // the real defense. Moving these to addEventListener would let this be tightened
+      // further (drop 'unsafe-inline' from script-src) as a future improvement.
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      // Helmet defaults script-src-attr to 'none' if not set explicitly, which
+      // blocks onclick="..." attributes even with 'unsafe-inline' on scriptSrc above
+      // (script-src-attr is a separate, more specific CSP3 directive for these).
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
+      frameSrc: ['https://www.google.com'], // Google Maps embed
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+    },
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // allows review photos to load correctly
+}));
+
+// ─────────────────────────────────────────
+// CORS — locked to your actual domain in production
+// ─────────────────────────────────────────
+const allowedOrigins = [
+  'https://chrishaircut.com',
+  'https://www.chrishaircut.com',
+  'http://localhost:3000', // keep for local dev
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+// ─────────────────────────────────────────
+// Rate limiting
+// ─────────────────────────────────────────
+
+// General API limiter — generous, just stops abuse/scraping
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' },
+});
+
+// Strict limiter for auth routes — prevents brute-force login/signup attempts
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please try again in 15 minutes.' },
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/signup', authLimiter);
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
+
+app.use('/api/auth',     require('./routes/auth'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/reviews',  require('./routes/reviews'));
+
+app.get('/*splat', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+module.exports = app;
