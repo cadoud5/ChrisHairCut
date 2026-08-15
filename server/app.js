@@ -13,18 +13,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      // NOTE: 'unsafe-inline' is still needed here because index.html/admin.html
-      // use static onclick="..." handlers baked into the markup (Book Now, tabs,
-      // modals, etc). Those aren't attacker-controlled, but they do mean CSP can't
-      // fully stop script injection on its own — the escaping fixes elsewhere are
-      // the real defense. Moving these to addEventListener would let this be tightened
-      // further (drop 'unsafe-inline' from script-src) as a future improvement.
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      // Helmet defaults script-src-attr to 'none' if not set explicitly, which
-      // blocks onclick="..." attributes even with 'unsafe-inline' on scriptSrc above
-      // (script-src-attr is a separate, more specific CSP3 directive for these).
-      scriptSrcAttr: ["'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      // All former inline onclick/onsubmit/onchange handlers and inline style
+      // attributes have been moved to external script.js/admin.js (bound via
+      // data-action attributes) and style.css, so CSP no longer needs to
+      // relax script-src/style-src with 'unsafe-inline'.
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:'],
       connectSrc: ["'self'"],

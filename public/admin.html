@@ -13,10 +13,10 @@
   <div class="login-wrap" id="loginWrap">
     <div class="login-box">
       <h1>Admin Access Required</h1>
-      <p style="font-size:13px;color:#6b6560;margin-bottom:1.5rem;line-height:1.6;">
+      <p class="admin-login-note">
         Please sign in from the main site using the Sign In button in the top nav. If your account has admin access, you'll be brought here automatically.
       </p>
-      <a href="/" class="back-to-site" style="margin-top:0;">← Back to site to sign in</a>
+      <a href="/" class="back-to-site back-to-site-flush">← Back to site to sign in</a>
     </div>
   </div>
 
@@ -25,17 +25,17 @@
       <h1 id="dashTitle">Bookings</h1>
       <div class="dash-actions">
         <a href="/" class="view-site-btn">View Site</a>
-        <button class="logout-btn" onclick="logout()">Log Out</button>
+        <button class="logout-btn" data-action="admin-logout">Log Out</button>
       </div>
     </div>
 
     <div class="admin-tabs">
-      <div class="admin-tab active" id="adminTabBookings" onclick="switchAdminTab('bookings')">Bookings</div>
-      <div class="admin-tab" id="adminTabReviews" onclick="switchAdminTab('reviews')">Reviews</div>
+      <div class="admin-tab active" id="adminTabBookings" data-action="switch-admin-tab" data-arg="bookings">Bookings</div>
+      <div class="admin-tab" id="adminTabReviews" data-action="switch-admin-tab" data-arg="reviews">Reviews</div>
     </div>
 
     <div id="tableWrap"></div>
-    <div id="reviewsWrap" style="display:none;"></div>
+    <div id="reviewsWrap" class="hidden"></div>
   </div>
 
   <script src="admin.js"></script>

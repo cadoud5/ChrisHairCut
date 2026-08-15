@@ -811,3 +811,77 @@ async function loadPublicReviews() {
 }
 
 loadPublicReviews();
+
+// ─────────────────────────────────────────
+// STATIC EVENT BINDINGS
+// (replaces inline onclick/onsubmit/onchange attributes so CSP script-src
+// can drop 'unsafe-inline' — see server/app.js)
+// ─────────────────────────────────────────
+
+const staticActionHandlers = {
+  'open-modal':               (arg) => openModal(arg),
+  'open-auth-modal':          () => openAuthModal(),
+  'switch-tab':                (arg) => switchTab(arg),
+  'close-auth-modal':          () => closeAuthModal(),
+  'switch-auth-tab':           (arg) => switchAuthTab(arg),
+  'open-settings-view':        () => openSettingsView(),
+  'customer-logout':           () => customerLogout(),
+  'close-review-view':         () => closeReviewView(),
+  'trigger-photo-input':       () => document.getElementById('review-photo-input').click(),
+  'remove-selected-photo':     () => removeSelectedPhoto(),
+  'submit-review':             () => submitReview(),
+  'close-settings-view':       () => closeSettingsView(),
+  'open-delete-confirm':       () => openDeleteConfirm(),
+  'confirm-delete-account':    () => confirmDeleteAccount(),
+  'close-modal':                () => closeModal(),
+  'open-account-prompt-signup': () => openAccountPromptSignup(),
+};
+
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el || !staticActionHandlers[el.dataset.action]) return;
+  if (el.tagName === 'A') e.preventDefault();
+  staticActionHandlers[el.dataset.action](el.dataset.arg);
+});
+
+// Enter/Space activates elements exposed as role="button" (service cards, etc.)
+document.querySelectorAll('[role="button"][data-action]').forEach((el) => {
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      el.click();
+    }
+  });
+});
+
+// Close auth modal when clicking its backdrop (outside the modal box)
+const authModalOverlayEl = document.getElementById('authModalOverlay');
+if (authModalOverlayEl) {
+  authModalOverlayEl.addEventListener('click', (e) => {
+    if (e.target === authModalOverlayEl) closeAuthModal();
+  });
+}
+
+// Close booking modal when clicking its backdrop (function already checks target)
+const modalOverlayEl = document.getElementById('modalOverlay');
+if (modalOverlayEl) {
+  modalOverlayEl.addEventListener('click', closeModalOutside);
+}
+
+const reviewPhotoInputEl = document.getElementById('review-photo-input');
+if (reviewPhotoInputEl) {
+  reviewPhotoInputEl.addEventListener('change', handlePhotoSelect);
+}
+
+const formBindings = {
+  loginForm: customerLogin,
+  signupForm: customerSignup,
+  accountInfoForm: updateAccountInfo,
+  changePasswordForm: changePassword,
+  bookingForm: submitForm,
+};
+
+Object.entries(formBindings).forEach(([id, handler]) => {
+  const formEl = document.getElementById(id);
+  if (formEl) formEl.addEventListener('submit', handler);
+});

@@ -840,3 +840,37 @@ tr:last-child td { border-bottom: none; }
   width: 100%; height: 160px; object-fit: cover;
   border-radius: 4px; margin-bottom: 0.75rem; display: block;
 }
+/* ─────────────────────────────────────────
+   FORMERLY-INLINE STYLES
+   (migrated out of style="" attributes so CSP style-src can drop
+   'unsafe-inline' — see server/app.js)
+   ───────────────────────────────────────── */
+.hidden { display: none; }
+
+.gmap-embed { border: 0; }
+
+.reviews-section { padding: 3rem 1.5rem; }
+.no-padding { padding: 0; }
+.heading-spaced { margin-bottom: 1.25rem; }
+
+.footer-legal-note { text-align: center; font-size: 11px; color: #9a9187; margin-top: 1rem; }
+.footer-legal-link { color: #9a9187; text-decoration: none; }
+
+.modal-title-tight { margin-bottom: 0; }
+.acct-bookings-heading { font-size: 14px; margin-bottom: 0.75rem; }
+.review-service-label { font-size: 13px; color: #6b6560; margin-bottom: 1rem; }
+.form-group-mt { margin-top: 1rem; }
+
+.auth-submit-dark { background: #3a3530; }
+.auth-submit-full { width: 100%; }
+.account-logout-spaced { margin-top: 0.5rem; }
+
+.danger-heading { color: #a32d2d; }
+.danger-warning-text { font-size: 12px; color: #9a9187; margin-bottom: 0.75rem; }
+.delete-confirm-box { margin-top: 0.75rem; }
+
+.post-booking-prompt { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #ede7e2; }
+.post-booking-prompt-text { font-size: 13px; color: #3a3530; margin-bottom: 0.75rem; }
+
+.admin-login-note { font-size: 13px; color: #6b6560; margin-bottom: 1.5rem; line-height: 1.6; }
+.back-to-site-flush { margin-top: 0; }

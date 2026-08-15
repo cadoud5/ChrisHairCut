@@ -22,14 +22,14 @@
       <img src="img/logo.png" alt="Chris Hair Cut logo"/>
     </div>
     <div class="topnav-right">
-      <button class="btn-booknow" onclick="openModal()">Book Now</button>
+      <button class="btn-booknow" data-action="open-modal">Book Now</button>
       <button class="topnav-search" aria-label="Search">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
         <circle cx="6.5" cy="6.5" r="4.5"/>
         <line x1="10.5" y1="10.5" x2="14" y2="14"/>
       </svg>
     </button>
-    <button class="topnav-account" id="accountBtn" onclick="openAuthModal()">
+    <button class="topnav-account" id="accountBtn" data-action="open-auth-modal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <circle cx="12" cy="8" r="4"/>
         <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/>
@@ -46,7 +46,7 @@
     <h1>Chris Hair Cut</h1>
     <div class="hero-pills">
       <a href="#services" class="hero-pill active">Services</a>
-      <a href="#" class="hero-pill" onclick="openModal(); return false;">Appointments</a>
+      <a href="#" class="hero-pill" data-action="open-modal">Appointments</a>
     </div>
   </div>
 </div>
@@ -60,41 +60,41 @@
       <div class="service-header">
         <h2 class="section-heading">Service Menu</h2>
         <div class="service-actions">
-          <button class="btn-book-lg" onclick="openModal()">Book</button>
+          <button class="btn-book-lg" data-action="open-modal">Book</button>
         </div>
       </div>
 
       <!-- Tabs -->
       <div class="tabs">
-        <div class="tab active" id="tab-services" onclick="switchTab('services')">Services</div>
-        <div class="tab" id="tab-staff" onclick="switchTab('staff')">Staff</div>
+        <div class="tab active" id="tab-services" data-action="switch-tab" data-arg="services">Services</div>
+        <div class="tab" id="tab-staff" data-action="switch-tab" data-arg="staff">Staff</div>
       </div>
 
       <!-- Services Panel -->
       <div class="services-panel" id="panel-services">
         <div class="services-grid">
 
-          <div class="service-card" role="button" tabindex="0" onclick="openModal('Mens Haircut')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('Mens Haircut')">
+          <div class="service-card" role="button" tabindex="0" data-action="open-modal" data-arg="Mens Haircut">
             <div class="service-title">Mens Haircut</div>
             <div class="service-footer">
-              <span class="service-book" onclick="openModal('Mens Haircut')">Book now</span>
+              <span class="service-book" data-action="open-modal" data-arg="Mens Haircut">Book now</span>
               <span class="service-meta">$17.00 &nbsp;•&nbsp; 30 mins</span>
             </div>
           </div>
 
-          <div class="service-card" role="button" tabindex="0" onclick="openModal('Buzzcut')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('Buzzcut')">
+          <div class="service-card" role="button" tabindex="0" data-action="open-modal" data-arg="Buzzcut">
             <div class="service-title">Buzzcut</div>
             <div class="service-footer">
-              <span class="service-book" onclick="openModal('Buzzcut')">Book now</span>
+              <span class="service-book" data-action="open-modal" data-arg="Buzzcut">Book now</span>
               <span class="service-meta">$10.00 &nbsp;•&nbsp; 30 mins</span>
             </div>
           </div>
 
-          <div class="service-card" role="button" tabindex="0" onclick="openModal('UIC Student')" onkeydown="if(event.key==='Enter'||event.key===' ') openModal('UIC Student')">
+          <div class="service-card" role="button" tabindex="0" data-action="open-modal" data-arg="UIC Student">
             <div class="service-title">UIC Student</div>
             <div class="service-note">Show student ID at appointment</div>
             <div class="service-footer">
-              <span class="service-book" onclick="openModal('UIC Student')">Book now</span>
+              <span class="service-book" data-action="open-modal" data-arg="UIC Student">Book now</span>
               <span class="service-meta">$13.00 &nbsp;•&nbsp; 30 mins</span>
             </div>
           </div>
@@ -117,7 +117,7 @@
       <!-- Location & Hours -->
       <div class="location-section">
         <div class="map-container">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.014405102811!2d-87.64873953348784!3d41.8674608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2da62450474f%3A0xeb8c44b4bce9016d!2sUIC%20Roosevelt%20Road%20Building!5e1!3m2!1sen!2sus!4v1779919914922!5m2!1sen!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.014405102811!2d-87.64873953348784!3d41.8674608!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2da62450474f%3A0xeb8c44b4bce9016d!2sUIC%20Roosevelt%20Road%20Building!5e1!3m2!1sen!2sus!4v1779919914922!5m2!1sen!2sus" width="600" height="450" class="gmap-embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         <div class="location-info">
           <h3>Location &amp; Hours</h3>
@@ -140,9 +140,9 @@
 </main>
 
 <!-- REVIEWS -->
-<section id="reviews-section" style="padding: 3rem 1.5rem; display: none;">
-  <div class="main-wrap" style="padding: 0;">
-    <h2 class="section-heading" style="margin-bottom:1.25rem;">What Clients Say</h2>
+<section id="reviews-section" class="reviews-section hidden">
+  <div class="main-wrap no-padding">
+    <h2 class="section-heading heading-spaced">What Clients Say</h2>
     <div class="reviews-grid" id="reviewsGrid">
       <p class="reviews-empty">Loading reviews…</p>
     </div>
@@ -164,29 +164,29 @@
       <svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8 0 3.2 0 3.6-.1 4.8-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.9.1-3.2 0-3.6 0-4.8-.1-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.1-4.8.1-3.3 1.7-4.8 4.9-4.9 1.3-.1 1.6-.1 4.8-.1zM12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1.0 8.3 0 8.7 0 12s0 3.7.1 4.9c.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24s3.7 0 4.9-.1c4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9s0-3.7-.1-4.9c-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 12 5.8zm0 10.2a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.4-11.8a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88z"/></svg>
     </a>
   </div>
-  <p style="text-align:center; font-size:11px; color:#9a9187; margin-top:1rem;">
-    <a href="/privacy.html" style="color:#9a9187; text-decoration:none;">Privacy Policy</a>
+  <p class="footer-legal-note">
+    <a href="/privacy.html" class="footer-legal-link">Privacy Policy</a>
     &nbsp;·&nbsp;
-    <a href="/terms.html" style="color:#9a9187; text-decoration:none;">Terms of Service</a>
+    <a href="/terms.html" class="footer-legal-link">Terms of Service</a>
   </p>
 </footer>
 
 <!-- ACCOUNT / AUTH MODAL -->
-<div class="auth-modal-overlay" id="authModalOverlay" onclick="if(event.target===this) closeAuthModal()">
+<div class="auth-modal-overlay" id="authModalOverlay">
   <div class="auth-modal">
-    <button class="auth-modal-close" onclick="closeAuthModal()" aria-label="Close">×</button>
+    <button class="auth-modal-close" data-action="close-auth-modal" aria-label="Close">×</button>
 
     <!-- LOGGED OUT: login/signup -->
     <div id="authLoggedOut">
       <div class="auth-tabs">
-        <div class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Sign In</div>
-        <div class="auth-tab" id="authTabSignup" onclick="switchAuthTab('signup')">Create Account</div>
+        <div class="auth-tab active" id="authTabLogin" data-action="switch-auth-tab" data-arg="login">Sign In</div>
+        <div class="auth-tab" id="authTabSignup" data-action="switch-auth-tab" data-arg="signup">Create Account</div>
       </div>
 
       <!-- LOGIN -->
       <div class="auth-panel active" id="authPanelLogin">
         <p class="auth-error" id="loginErrorMsg"></p>
-        <form onsubmit="customerLogin(event)">
+        <form id="loginForm">
           <div class="form-group">
             <label for="login-email">Email</label>
             <input type="email" id="login-email" placeholder="you@example.com" required />
@@ -202,7 +202,7 @@
       <!-- SIGNUP -->
       <div class="auth-panel" id="authPanelSignup">
         <p class="auth-error" id="signupErrorMsg"></p>
-        <form onsubmit="customerSignup(event)">
+        <form id="signupForm">
           <div class="form-row">
             <div class="form-group">
               <label for="signup-fname">First Name</label>
@@ -242,8 +242,8 @@
       <!-- MAIN ACCOUNT VIEW -->
       <div id="acctMainView">
         <div class="acct-header-row">
-          <p class="modal-title" style="margin-bottom:0;">My Account</p>
-          <button class="settings-gear-btn" onclick="openSettingsView()" aria-label="Account settings" title="Settings">
+          <p class="modal-title modal-title-tight">My Account</p>
+          <button class="settings-gear-btn" data-action="open-settings-view" aria-label="Account settings" title="Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -254,24 +254,24 @@
           <p><strong id="acctName"></strong></p>
           <p id="acctEmail"></p>
         </div>
-        <p class="modal-title" id="acctBookingsHeading" style="font-size:14px;margin-bottom:0.75rem;">My Bookings</p>
+        <p class="modal-title acct-bookings-heading" id="acctBookingsHeading">My Bookings</p>
         <div class="account-bookings-list" id="acctBookingsList"></div>
 
-        <button class="account-logout-btn" onclick="customerLogout()">Log Out</button>
+        <button class="account-logout-btn" data-action="customer-logout">Log Out</button>
       </div>
 
       <!-- REVIEW SUBMISSION VIEW -->
-      <div id="acctReviewView" style="display:none;">
+      <div id="acctReviewView" class="hidden">
         <div class="acct-header-row">
-          <button class="settings-back-btn" onclick="closeReviewView()" aria-label="Back">
+          <button class="settings-back-btn" data-action="close-review-view" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
-          <p class="modal-title" style="margin-bottom:0;">Leave a Review</p>
+          <p class="modal-title modal-title-tight">Leave a Review</p>
         </div>
 
-        <p style="font-size:13px;color:#6b6560;margin-bottom:1rem;" id="reviewServiceLabel"></p>
+        <p class="review-service-label" id="reviewServiceLabel"></p>
         <p class="auth-error" id="reviewErrorMsg"></p>
 
         <div class="star-rating" id="starRating">
@@ -282,16 +282,16 @@
           <span class="star" data-value="5">★</span>
         </div>
 
-        <div class="form-group" style="margin-top:1rem;">
+        <div class="form-group form-group-mt">
           <label for="review-comment">Comment (optional)</label>
           <textarea id="review-comment" placeholder="How was your experience?" rows="4"></textarea>
         </div>
 
         <div class="form-group">
           <label>Photo (optional)</label>
-          <input type="file" id="review-photo-input" accept="image/png, image/jpeg, image/webp, image/gif" style="display:none;" onchange="handlePhotoSelect(event)" />
+          <input type="file" id="review-photo-input" accept="image/png, image/jpeg, image/webp, image/gif" class="hidden" />
 
-          <div id="photoUploadPrompt" class="photo-upload-btn" onclick="document.getElementById('review-photo-input').click()">
+          <div id="photoUploadPrompt" class="photo-upload-btn" data-action="trigger-photo-input">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
@@ -299,30 +299,30 @@
             <span>Add a Photo</span>
           </div>
 
-          <div id="photoPreviewWrap" style="display:none;">
+          <div id="photoPreviewWrap" class="hidden">
             <img id="photoPreviewImg" class="photo-preview-img" alt="Selected photo preview" />
-            <button type="button" class="photo-remove-btn" onclick="removeSelectedPhoto()" aria-label="Remove photo">×</button>
+            <button type="button" class="photo-remove-btn" data-action="remove-selected-photo" aria-label="Remove photo">×</button>
           </div>
         </div>
 
-        <button class="auth-submit" onclick="submitReview()">Submit Review</button>
+        <button class="auth-submit" data-action="submit-review">Submit Review</button>
       </div>
 
       <!-- SETTINGS VIEW -->
-      <div id="acctSettingsView" style="display:none;">
+      <div id="acctSettingsView" class="hidden">
         <div class="acct-header-row">
-          <button class="settings-back-btn" onclick="closeSettingsView()" aria-label="Back">
+          <button class="settings-back-btn" data-action="close-settings-view" aria-label="Back">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
-          <p class="modal-title" style="margin-bottom:0;">Settings</p>
+          <p class="modal-title modal-title-tight">Settings</p>
         </div>
 
         <p class="auth-error" id="settingsErrorMsg"></p>
         <p class="settings-success" id="settingsSuccessMsg"></p>
 
-        <form onsubmit="updateAccountInfo(event)">
+        <form id="accountInfoForm">
           <div class="form-row">
             <div class="form-group">
               <label for="settings-fname">First Name</label>
@@ -347,7 +347,7 @@
         <div class="settings-divider"></div>
 
         <p class="settings-subheading">Change Password</p>
-        <form onsubmit="changePassword(event)">
+        <form id="changePasswordForm">
           <div class="form-group">
             <label for="settings-current-password">Current Password</label>
             <input type="password" id="settings-current-password" placeholder="••••••••" />
@@ -356,22 +356,22 @@
             <label for="settings-new-password">New Password</label>
             <input type="password" id="settings-new-password" placeholder="••••••••" minlength="6" />
           </div>
-          <button type="submit" class="auth-submit" style="background:#3a3530;">Update Password</button>
+          <button type="submit" class="auth-submit auth-submit-dark">Update Password</button>
         </form>
 
         <div class="settings-divider"></div>
 
-        <p class="settings-subheading" style="color:#a32d2d;">Danger Zone</p>
-        <p style="font-size:12px;color:#9a9187;margin-bottom:0.75rem;">Deleting your account is permanent and cannot be undone.</p>
-        <button class="delete-account-btn" onclick="openDeleteConfirm()">Delete My Account</button>
+        <p class="settings-subheading danger-heading">Danger Zone</p>
+        <p class="danger-warning-text">Deleting your account is permanent and cannot be undone.</p>
+        <button class="delete-account-btn" data-action="open-delete-confirm">Delete My Account</button>
 
-        <div id="deleteConfirmBox" style="display:none;margin-top:0.75rem;">
+        <div id="deleteConfirmBox" class="delete-confirm-box hidden">
           <p class="auth-error" id="deleteErrorMsg"></p>
           <div class="form-group">
             <label for="delete-password">Confirm Password</label>
             <input type="password" id="delete-password" placeholder="••••••••" />
           </div>
-          <button class="delete-account-btn" onclick="confirmDeleteAccount()">Yes, Permanently Delete My Account</button>
+          <button class="delete-account-btn" data-action="confirm-delete-account">Yes, Permanently Delete My Account</button>
         </div>
       </div>
 
@@ -381,14 +381,14 @@
 </div>
 
 <!-- BOOKING MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+<div class="modal-overlay" id="modalOverlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+    <button class="modal-close" data-action="close-modal" aria-label="Close">×</button>
 
     <div class="modal-form" id="modalForm">
       <p class="modal-title" id="modal-title">Book an Appointment</p>
 
-      <form onsubmit="submitForm(event)">
+      <form id="bookingForm">
         <div class="form-row">
           <div class="form-group">
             <label for="m-fname">First Name</label>
@@ -457,12 +457,12 @@
       <p class="success-title">Booking Requested!</p>
       <p class="success-msg">Thanks! Chris will confirm your appointment via phone or email shortly.</p>
 
-      <div id="postBookingAccountPrompt" style="display:none; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid #ede7e2;">
-        <p style="font-size:13px; color:#3a3530; margin-bottom:0.75rem;">
+      <div id="postBookingAccountPrompt" class="hidden post-booking-prompt">
+        <p class="post-booking-prompt-text">
           Create a free account to save your info, track your appointments, and leave reviews — it takes 10 seconds.
         </p>
-        <button class="auth-submit" style="width:100%;" onclick="openAccountPromptSignup()">Create Account</button>
-        <button class="account-logout-btn" style="width:100%; margin-top:0.5rem;" onclick="closeModal()">No thanks</button>
+        <button class="auth-submit auth-submit-full" data-action="open-account-prompt-signup">Create Account</button>
+        <button class="account-logout-btn auth-submit-full account-logout-spaced" data-action="close-modal">No thanks</button>
       </div>
     </div>
   </div>

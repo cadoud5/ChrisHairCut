@@ -64,6 +64,7 @@ router.get('/', async (req, res) => {
 
 // Get all reviews including unapproved (admin only, for moderation)
 router.get('/all', verifyToken, requireAdmin, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const result = await pool.query(
       `SELECT r.id, r.rating, r.comment, r.photo_url, r.created_at, r.approved, u.name as customer_name, b.service
@@ -81,6 +82,7 @@ router.get('/all', verifyToken, requireAdmin, async (req, res) => {
 
 // Get bookings the logged-in customer can review
 router.get('/reviewable', verifyToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const result = await pool.query(
       `SELECT b.id, b.service, b.start_date

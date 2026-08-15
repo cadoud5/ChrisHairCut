@@ -124,6 +124,7 @@ router.post('/',
 );
 
 router.get('/', verifyToken, requireAdmin, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const result = await pool.query('SELECT * FROM bookings ORDER BY start_date ASC');
     res.json(result.rows);

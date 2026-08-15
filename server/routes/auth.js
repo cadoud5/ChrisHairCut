@@ -110,6 +110,7 @@ router.post('/login',
 
 // Get current account info
 router.get('/me', verifyToken, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
     const result = await pool.query(
       'SELECT id, name, email, phone, role FROM users WHERE id = $1',

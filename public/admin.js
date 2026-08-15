@@ -347,3 +347,20 @@ async function deleteReview(id) {
 if (getToken()) {
   showDashboard();
 }
+
+// ─────────────────────────────────────────
+// STATIC EVENT BINDINGS
+// (replaces inline onclick attributes so CSP script-src can drop
+// 'unsafe-inline' — see server/app.js)
+// ─────────────────────────────────────────
+
+const adminStaticActionHandlers = {
+  'admin-logout':     () => logout(),
+  'switch-admin-tab': (arg) => switchAdminTab(arg),
+};
+
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el || !adminStaticActionHandlers[el.dataset.action]) return;
+  adminStaticActionHandlers[el.dataset.action](el.dataset.arg);
+});
