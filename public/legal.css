@@ -1,3 +1,38 @@
+/* Self-hosted Inter (latin subset only) — replaces the Google Fonts CDN link
+   so this stylesheet no longer needs an external, non-SRI-able resource.
+   Inter is a variable font: Google serves ONE physical file covering weights
+   300–600 and reuses it across each font-weight declaration below — that's
+   why all four @font-face blocks point at the same local file. This mirrors
+   Google's own CSS structure exactly. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Inter', sans-serif;

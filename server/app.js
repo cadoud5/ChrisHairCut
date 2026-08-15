@@ -18,8 +18,8 @@ app.use(helmet({
       // data-action attributes) and style.css, so CSP no longer needs to
       // relax script-src/style-src with 'unsafe-inline'.
       scriptSrc: ["'self'"],
-      styleSrc: ["'self'", 'https://fonts.googleapis.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+      styleSrc: ["'self'"],
+      fontSrc: ["'self'"],
       imgSrc: ["'self'", 'data:'],
       connectSrc: ["'self'"],
       frameSrc: ['https://www.google.com'], // Google Maps embed
