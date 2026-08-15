@@ -78,13 +78,23 @@ app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/signup', authLimiter);
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public'), {
+  setHeaders: (res, filePath) => {
+    // HTML shells should always revalidate — don't let browsers/proxies
+    // cache a stale page after a deploy, and don't leave Cache-Control
+    // unset (which ZAP flags as worth a manual check).
+    if (filePath.endsWith('.html')) {
+      res.set('Cache-Control', 'no-cache');
+    }
+  },
+}));
 
 app.use('/api/auth',     require('./routes/auth'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/reviews',  require('./routes/reviews'));
 
 app.get('/*splat', (req, res) => {
+  res.set('Cache-Control', 'no-cache');
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
