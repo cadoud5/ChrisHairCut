@@ -3,35 +3,26 @@ const router = express.Router();
 const pool = require('../db');
 const { verifyToken, requireAdmin } = require('../middleware/auth');
 const multer = require('multer');
+const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
 // ─────────────────────────────────────────
-// Multer config — saves review photos to public/uploads/reviews
+// Multer config — buffers review photo uploads in memory so we can
+// process them with sharp (resize + convert to WebP) before writing
+// anything to disk. Files never touch disk in their original,
+// uncompressed, attacker-supplied format.
 // ─────────────────────────────────────────
 const uploadDir = path.join(__dirname, '../../public/uploads/reviews');
+fs.mkdirSync(uploadDir, { recursive: true });
 
-// Map allowed mimetypes to a fixed, safe extension — we never trust the
-// client-supplied original filename/extension directly, since both the
-// filename and the mimetype header are attacker-controlled.
-const ALLOWED_MIME_TO_EXT = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'image/gif': '.gif',
-};
+const MAX_REVIEW_PHOTO_DIMENSION = 1600; // px, longest side
+const REVIEW_PHOTO_WEBP_QUALITY = 80;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = ALLOWED_MIME_TO_EXT[file.mimetype] || '.bin';
-    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'review-' + unique + ext);
-  }
-});
+const ALLOWED_MIMETYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 function fileFilter(req, file, cb) {
-  if (Object.prototype.hasOwnProperty.call(ALLOWED_MIME_TO_EXT, file.mimetype)) {
+  if (ALLOWED_MIMETYPES.has(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Only image files are allowed'));
@@ -39,10 +30,41 @@ function fileFilter(req, file, cb) {
 }
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB max
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB max (pre-processing upload size)
 });
+
+// Resizes + converts the buffered upload to WebP and writes it to disk.
+// Runs after upload.single('photo'); no-ops if no file was sent.
+// Sets req.file.filename/path so the rest of the route (which expects
+// multer's old disk-storage shape) doesn't need to change.
+async function processReviewPhoto(req, res, next) {
+  if (!req.file) return next();
+
+  try {
+    const filename = 'review-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + '.webp';
+    const filePath = path.join(uploadDir, filename);
+
+    await sharp(req.file.buffer)
+      .rotate() // auto-orient from EXIF before sharp strips metadata
+      .resize({
+        width: MAX_REVIEW_PHOTO_DIMENSION,
+        height: MAX_REVIEW_PHOTO_DIMENSION,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: REVIEW_PHOTO_WEBP_QUALITY })
+      .toFile(filePath);
+
+    req.file.filename = filename;
+    req.file.path = filePath;
+    next();
+  } catch (err) {
+    console.error('Review photo processing failed:', err);
+    res.status(400).json({ error: 'Could not process the uploaded photo. Please try a different image.' });
+  }
+}
 
 // Get all approved reviews (public — shown on homepage)
 router.get('/', async (req, res) => {
@@ -122,7 +144,7 @@ router.get('/mine', verifyToken, async (req, res) => {
 });
 
 // Submit a review for a completed booking (with optional photo)
-router.post('/', verifyToken, upload.single('photo'), async (req, res) => {
+router.post('/', verifyToken, upload.single('photo'), processReviewPhoto, async (req, res) => {
   const { bookingId, rating, comment } = req.body;
   const ratingNum = parseInt(rating);
 
